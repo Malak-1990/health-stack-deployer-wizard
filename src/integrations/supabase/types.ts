@@ -9,7 +9,168 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      appointments: {
+        Row: {
+          appointment_date: string
+          appointment_type: string
+          created_at: string
+          doctor_name: string
+          id: string
+          location: string | null
+          notes: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          appointment_date: string
+          appointment_type: string
+          created_at?: string
+          doctor_name: string
+          id?: string
+          location?: string | null
+          notes?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          appointment_date?: string
+          appointment_type?: string
+          created_at?: string
+          doctor_name?: string
+          id?: string
+          location?: string | null
+          notes?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      daily_health_logs: {
+        Row: {
+          created_at: string
+          date: string
+          exercise_minutes: number | null
+          id: string
+          mood: number | null
+          notes: string | null
+          sleep_hours: number | null
+          stress_level: number | null
+          updated_at: string
+          user_id: string
+          water_intake_ml: number | null
+          weight_kg: number | null
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          exercise_minutes?: number | null
+          id?: string
+          mood?: number | null
+          notes?: string | null
+          sleep_hours?: number | null
+          stress_level?: number | null
+          updated_at?: string
+          user_id: string
+          water_intake_ml?: number | null
+          weight_kg?: number | null
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          exercise_minutes?: number | null
+          id?: string
+          mood?: number | null
+          notes?: string | null
+          sleep_hours?: number | null
+          stress_level?: number | null
+          updated_at?: string
+          user_id?: string
+          water_intake_ml?: number | null
+          weight_kg?: number | null
+        }
+        Relationships: []
+      }
+      heart_rate_readings: {
+        Row: {
+          created_at: string
+          diastolic_bp: number | null
+          heart_rate: number
+          id: string
+          notes: string | null
+          recorded_at: string
+          systolic_bp: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          diastolic_bp?: number | null
+          heart_rate: number
+          id?: string
+          notes?: string | null
+          recorded_at?: string
+          systolic_bp?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          diastolic_bp?: number | null
+          heart_rate?: number
+          id?: string
+          notes?: string | null
+          recorded_at?: string
+          systolic_bp?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          date_of_birth: string | null
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          full_name: string | null
+          gender: string | null
+          height_cm: number | null
+          id: string
+          medical_conditions: string[] | null
+          medications: string[] | null
+          updated_at: string
+          weight_kg: number | null
+        }
+        Insert: {
+          created_at?: string
+          date_of_birth?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          full_name?: string | null
+          gender?: string | null
+          height_cm?: number | null
+          id: string
+          medical_conditions?: string[] | null
+          medications?: string[] | null
+          updated_at?: string
+          weight_kg?: number | null
+        }
+        Update: {
+          created_at?: string
+          date_of_birth?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          full_name?: string | null
+          gender?: string | null
+          height_cm?: number | null
+          id?: string
+          medical_conditions?: string[] | null
+          medications?: string[] | null
+          updated_at?: string
+          weight_kg?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
