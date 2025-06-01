@@ -14,6 +14,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 
+type AppointmentStatus = 'scheduled' | 'completed' | 'cancelled';
+
 interface Appointment {
   id: string;
   doctor_name: string;
@@ -21,7 +23,7 @@ interface Appointment {
   appointment_date: string;
   location?: string;
   notes?: string;
-  status: 'scheduled' | 'completed' | 'cancelled';
+  status: AppointmentStatus;
 }
 
 const AppointmentsCard = () => {
@@ -37,7 +39,7 @@ const AppointmentsCard = () => {
     appointment_time: '',
     location: '',
     notes: '',
-    status: 'scheduled' as const
+    status: 'scheduled' as AppointmentStatus
   });
 
   useEffect(() => {
@@ -62,7 +64,12 @@ const AppointmentsCard = () => {
         variant: "destructive",
       });
     } else {
-      setAppointments(data || []);
+      // Type assertion to ensure the status field is properly typed
+      const typedAppointments = (data || []).map(appointment => ({
+        ...appointment,
+        status: appointment.status as AppointmentStatus
+      }));
+      setAppointments(typedAppointments);
     }
   };
 
@@ -260,7 +267,7 @@ const AppointmentsCard = () => {
                 {editingAppointment && (
                   <div>
                     <Label htmlFor="status">Status</Label>
-                    <Select value={formData.status} onValueChange={(value: any) => setFormData({ ...formData, status: value })}>
+                    <Select value={formData.status} onValueChange={(value: AppointmentStatus) => setFormData({ ...formData, status: value })}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
