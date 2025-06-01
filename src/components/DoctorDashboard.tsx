@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -40,36 +39,40 @@ const DoctorDashboard = () => {
       // Load patient data with latest heart rate readings
       const { data: profilesData } = await supabase
         .from('profiles')
-        .select(`
-          id,
-          full_name,
-          heart_rate_readings (
-            heart_rate,
-            recorded_at
-          )
-        `)
+        .select('id, full_name')
         .order('created_at', { ascending: false });
 
-      // Process patient data
-      const patientList: Patient[] = (profilesData || []).map(profile => {
-        const latestReading = profile.heart_rate_readings?.[0];
-        const heartRate = latestReading?.heart_rate || null;
-        
-        let status: 'normal' | 'warning' | 'critical' = 'normal';
-        if (heartRate) {
-          if (heartRate > 120 || heartRate < 50) status = 'critical';
-          else if (heartRate > 100 || heartRate < 60) status = 'warning';
-        }
+      // Get heart rate readings for each profile
+      const patientList: Patient[] = [];
+      
+      if (profilesData) {
+        for (const profile of profilesData) {
+          const { data: heartRateData } = await supabase
+            .from('heart_rate_readings')
+            .select('heart_rate, recorded_at')
+            .eq('user_id', profile.id)
+            .order('recorded_at', { ascending: false })
+            .limit(1);
 
-        return {
-          id: profile.id,
-          full_name: profile.full_name || 'مريض غير مسمى',
-          email: `patient-${profile.id.slice(0, 8)}@example.com`,
-          latest_heart_rate: heartRate,
-          last_reading: latestReading?.recorded_at || null,
-          status
-        };
-      });
+          const latestReading = heartRateData?.[0];
+          const heartRate = latestReading?.heart_rate || null;
+          
+          let status: 'normal' | 'warning' | 'critical' = 'normal';
+          if (heartRate) {
+            if (heartRate > 120 || heartRate < 50) status = 'critical';
+            else if (heartRate > 100 || heartRate < 60) status = 'warning';
+          }
+
+          patientList.push({
+            id: profile.id,
+            full_name: profile.full_name || 'مريض غير مسمى',
+            email: `patient-${profile.id.slice(0, 8)}@example.com`,
+            latest_heart_rate: heartRate,
+            last_reading: latestReading?.recorded_at || null,
+            status
+          });
+        }
+      }
 
       setPatients(patientList);
 

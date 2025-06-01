@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -35,21 +34,20 @@ const FamilyDashboard = () => {
       // For demo, we'll show the first patient's data
       const { data: profileData } = await supabase
         .from('profiles')
-        .select(`
-          id,
-          full_name,
-          emergency_contact_name,
-          emergency_contact_phone,
-          heart_rate_readings (
-            heart_rate,
-            recorded_at
-          )
-        `)
+        .select('id, full_name, emergency_contact_name, emergency_contact_phone')
         .limit(1)
         .single();
 
       if (profileData) {
-        const latestReading = profileData.heart_rate_readings?.[0];
+        // Get the latest heart rate reading for this profile
+        const { data: heartRateData } = await supabase
+          .from('heart_rate_readings')
+          .select('heart_rate, recorded_at')
+          .eq('user_id', profileData.id)
+          .order('recorded_at', { ascending: false })
+          .limit(1);
+
+        const latestReading = heartRateData?.[0];
         const heartRate = latestReading?.heart_rate || null;
         
         let status: 'normal' | 'warning' | 'critical' = 'normal';
