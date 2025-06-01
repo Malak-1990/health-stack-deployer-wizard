@@ -1,6 +1,8 @@
 
 /// <reference path="../vite-env.d.ts" />
 
+import type { BluetoothDevice, BluetoothRemoteGATTCharacteristic } from '../vite-env.d.ts';
+
 export interface HeartRateDevice {
   id: string;
   name: string;

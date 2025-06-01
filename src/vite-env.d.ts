@@ -2,7 +2,7 @@
 /// <reference types="vite/client" />
 
 // Web Bluetooth API Type Declarations
-interface BluetoothDevice {
+export interface BluetoothDevice {
   id: string;
   name?: string;
   gatt?: BluetoothRemoteGATTServer;
@@ -10,7 +10,7 @@ interface BluetoothDevice {
   removeEventListener(type: string, listener: EventListener): void;
 }
 
-interface BluetoothRemoteGATTServer {
+export interface BluetoothRemoteGATTServer {
   device: BluetoothDevice;
   connected: boolean;
   connect(): Promise<BluetoothRemoteGATTServer>;
@@ -18,13 +18,13 @@ interface BluetoothRemoteGATTServer {
   getPrimaryService(service: BluetoothServiceUUID): Promise<BluetoothRemoteGATTService>;
 }
 
-interface BluetoothRemoteGATTService {
+export interface BluetoothRemoteGATTService {
   device: BluetoothDevice;
   uuid: string;
   getCharacteristic(characteristic: BluetoothCharacteristicUUID): Promise<BluetoothRemoteGATTCharacteristic>;
 }
 
-interface BluetoothRemoteGATTCharacteristic {
+export interface BluetoothRemoteGATTCharacteristic {
   service: BluetoothRemoteGATTService;
   uuid: string;
   value?: DataView;
@@ -58,6 +58,18 @@ declare global {
   interface Navigator {
     bluetooth?: Bluetooth;
   }
+  
+  // Make types globally available
+  interface Window {
+    BluetoothDevice: BluetoothDevice;
+    BluetoothRemoteGATTCharacteristic: BluetoothRemoteGATTCharacteristic;
+  }
+}
+
+// Declare global types
+declare global {
+  type BluetoothDevice = import('./vite-env.d.ts').BluetoothDevice;
+  type BluetoothRemoteGATTCharacteristic = import('./vite-env.d.ts').BluetoothRemoteGATTCharacteristic;
 }
 
 export {};
