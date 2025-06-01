@@ -1,4 +1,6 @@
 
+/// <reference path="../vite-env.d.ts" />
+
 export interface HeartRateDevice {
   id: string;
   name: string;
@@ -41,7 +43,7 @@ class BluetoothService {
   async connectToDevice(deviceId: string): Promise<boolean> {
     try {
       if (!this.device) {
-        const device = await navigator.bluetooth.requestDevice({
+        const device = await navigator.bluetooth!.requestDevice({
           filters: [{ services: ['heart_rate'] }]
         });
         this.device = device;
