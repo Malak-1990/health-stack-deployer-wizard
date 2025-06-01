@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Heart, Phone, AlertTriangle, Calendar, Shield } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import EmergencyAlertReceiver from '@/components/EmergencyAlertReceiver';
 
 interface PatientData {
   id: string;
@@ -121,6 +122,9 @@ const FamilyDashboard = () => {
 
   return (
     <div className={`space-y-6 ${direction === 'rtl' ? 'font-cairo' : ''}`}>
+      {/* Emergency Alerts */}
+      <EmergencyAlertReceiver />
+
       {/* Welcome Message */}
       <div className="text-center">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">
