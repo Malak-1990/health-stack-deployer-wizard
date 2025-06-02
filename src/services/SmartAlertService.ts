@@ -86,7 +86,11 @@ class SmartAlertService {
         return [];
       }
 
-      return data || [];
+      // Type cast the severity field to ensure type safety
+      return (data || []).map(alert => ({
+        ...alert,
+        severity: alert.severity as 'low' | 'medium' | 'high' | 'critical'
+      }));
     } catch (error) {
       console.error('Error fetching alerts:', error);
       return [];

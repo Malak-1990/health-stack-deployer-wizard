@@ -1,11 +1,10 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { smartAlertService, SmartAlert } from '@/services/SmartAlertService';
-import { Alert, CheckCircle, Clock, XCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Clock, XCircle } from 'lucide-react';
 
 const SmartAlertsCard = () => {
   const { user } = useAuth();
@@ -53,7 +52,7 @@ const SmartAlertsCard = () => {
   const getSeverityIcon = (severity: string) => {
     switch (severity) {
       case 'critical': return <XCircle className="h-4 w-4" />;
-      case 'high': return <Alert className="h-4 w-4" />;
+      case 'high': return <AlertTriangle className="h-4 w-4" />;
       case 'medium': return <Clock className="h-4 w-4" />;
       default: return <CheckCircle className="h-4 w-4" />;
     }
@@ -64,7 +63,7 @@ const SmartAlertsCard = () => {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center">
-            <Alert className="h-5 w-5 mr-2" />
+            <AlertTriangle className="h-5 w-5 mr-2" />
             التنبيهات الذكية
           </CardTitle>
         </CardHeader>
@@ -83,7 +82,7 @@ const SmartAlertsCard = () => {
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center">
-            <Alert className="h-5 w-5 mr-2" />
+            <AlertTriangle className="h-5 w-5 mr-2" />
             التنبيهات الذكية
           </div>
           {unreadAlerts.length > 0 && (
