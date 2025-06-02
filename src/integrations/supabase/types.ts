@@ -48,6 +48,39 @@ export type Database = {
         }
         Relationships: []
       }
+      connected_devices: {
+        Row: {
+          device_id: string
+          device_name: string
+          device_type: string
+          id: string
+          is_active: boolean
+          last_connected: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          device_id: string
+          device_name: string
+          device_type: string
+          id?: string
+          is_active?: boolean
+          last_connected?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          device_id?: string
+          device_name?: string
+          device_type?: string
+          id?: string
+          is_active?: boolean
+          last_connected?: string
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       daily_health_logs: {
         Row: {
           created_at: string
@@ -93,10 +126,38 @@ export type Database = {
         }
         Relationships: []
       }
+      encrypted_health_data: {
+        Row: {
+          created_at: string
+          data_type: string
+          encrypted_data: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data_type: string
+          encrypted_data: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data_type?: string
+          encrypted_data?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       heart_rate_readings: {
         Row: {
           created_at: string
           diastolic_bp: number | null
+          encrypted_notes: string | null
           heart_rate: number
           id: string
           notes: string | null
@@ -107,6 +168,7 @@ export type Database = {
         Insert: {
           created_at?: string
           diastolic_bp?: number | null
+          encrypted_notes?: string | null
           heart_rate: number
           id?: string
           notes?: string | null
@@ -117,6 +179,7 @@ export type Database = {
         Update: {
           created_at?: string
           diastolic_bp?: number | null
+          encrypted_notes?: string | null
           heart_rate?: number
           id?: string
           notes?: string | null
@@ -168,6 +231,42 @@ export type Database = {
           medications?: string[] | null
           updated_at?: string
           weight_kg?: number | null
+        }
+        Relationships: []
+      }
+      smart_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string
+          data: Json | null
+          id: string
+          is_read: boolean
+          message: string
+          resolved_at: string | null
+          severity: string
+          user_id: string
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string
+          data?: Json | null
+          id?: string
+          is_read?: boolean
+          message: string
+          resolved_at?: string | null
+          severity: string
+          user_id: string
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string
+          data?: Json | null
+          id?: string
+          is_read?: boolean
+          message?: string
+          resolved_at?: string | null
+          severity?: string
+          user_id?: string
         }
         Relationships: []
       }
