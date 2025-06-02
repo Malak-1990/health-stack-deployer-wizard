@@ -68,7 +68,7 @@ class BluetoothService {
   }
 
   private handleHeartRateData(event: Event) {
-    const target = event.target as BluetoothRemoteGATTCharacteristic;
+    const target = event.target as unknown as BluetoothRemoteGATTCharacteristic;
     const value = target.value;
     if (!value) return;
 
