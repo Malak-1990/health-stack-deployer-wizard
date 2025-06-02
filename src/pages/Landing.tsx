@@ -1,10 +1,11 @@
+
 import { useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Heart, Users, Shield, Activity, ArrowRight, Star, CheckCircle } from 'lucide-react';
+import { Heart, Users, Shield, Activity, ArrowRight, Star, CheckCircle, Globe } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import ProjectInfo from '@/components/ProjectInfo';
 import AnimatedFeatureCards from '@/components/AnimatedFeatureCards';

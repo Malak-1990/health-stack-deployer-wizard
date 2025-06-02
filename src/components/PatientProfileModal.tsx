@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -29,9 +28,14 @@ interface PatientProfile {
   email?: string;
   phone?: string;
   age?: number;
-  medical_history?: string;
-  medications?: string;
-  emergency_contact?: string;
+  date_of_birth?: string;
+  gender?: string;
+  height_cm?: number;
+  weight_kg?: number;
+  medical_conditions?: string[];
+  medications?: string[];
+  emergency_contact_name?: string;
+  emergency_contact_phone?: string;
 }
 
 const PatientProfileModal = ({ patientId, patientName, children }: PatientProfileModalProps) => {
@@ -281,12 +285,32 @@ const PatientProfileModal = ({ patientId, patientName, children }: PatientProfil
                       <span className="font-medium">العمر:</span>
                       <span>{profile?.age || 'غير محدد'}</span>
                     </div>
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-gray-500" />
+                      <span className="font-medium">تاريخ الميلاد:</span>
+                      <span>{profile?.date_of_birth || 'غير محدد'}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <User className="h-4 w-4 text-gray-500" />
+                      <span className="font-medium">الجنس:</span>
+                      <span>{profile?.gender || 'غير محدد'}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Scale className="h-4 w-4 text-gray-500" />
+                      <span className="font-medium">الطول:</span>
+                      <span>{profile?.height_cm || 'غير محدد'}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Scale className="h-4 w-4 text-gray-500" />
+                      <span className="font-medium">الوزن:</span>
+                      <span>{profile?.weight_kg || 'غير محدد'}</span>
+                    </div>
                   </div>
 
-                  {profile?.medical_history && (
+                  {profile?.medical_conditions && (
                     <div>
-                      <h4 className="font-medium mb-2">التاريخ المرضي:</h4>
-                      <p className="text-gray-600 p-3 bg-gray-50 rounded-lg">{profile.medical_history}</p>
+                      <h4 className="font-medium mb-2">الأمراض المرضية:</h4>
+                      <p className="text-gray-600 p-3 bg-gray-50 rounded-lg">{profile.medical_conditions?.join(', ')}</p>
                     </div>
                   )}
 
@@ -297,10 +321,12 @@ const PatientProfileModal = ({ patientId, patientName, children }: PatientProfil
                     </div>
                   )}
 
-                  {profile?.emergency_contact && (
+                  {profile?.emergency_contact_name && profile?.emergency_contact_phone && (
                     <div>
                       <h4 className="font-medium mb-2">جهة الاتصال في الطوارئ:</h4>
-                      <p className="text-gray-600 p-3 bg-gray-50 rounded-lg">{profile.emergency_contact}</p>
+                      <p className="text-gray-600 p-3 bg-gray-50 rounded-lg">
+                        {profile.emergency_contact_name} - {profile.emergency_contact_phone}
+                      </p>
                     </div>
                   )}
                 </CardContent>
