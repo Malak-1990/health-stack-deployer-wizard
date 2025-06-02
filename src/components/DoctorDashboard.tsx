@@ -7,6 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Users, Calendar, AlertTriangle, Activity, Search, Filter } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import PatientProfileModal from '@/components/PatientProfileModal';
 
 interface Patient {
   id: string;
@@ -205,8 +206,7 @@ const DoctorDashboard = () => {
               filteredPatients.map((patient) => (
                 <div
                   key={patient.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 cursor-pointer"
-                  onClick={() => handlePatientClick(patient.id)}
+                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
                 >
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
@@ -230,9 +230,14 @@ const DoctorDashboard = () => {
                       </p>
                     )}
                   </div>
-                  <Button variant="outline" size="sm">
-                    عرض الملف
-                  </Button>
+                  <PatientProfileModal 
+                    patientId={patient.id} 
+                    patientName={patient.full_name}
+                  >
+                    <Button variant="outline" size="sm">
+                      عرض الملف
+                    </Button>
+                  </PatientProfileModal>
                 </div>
               ))
             ) : (
