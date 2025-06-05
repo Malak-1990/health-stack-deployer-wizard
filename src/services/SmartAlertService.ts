@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { emergencyAlertService } from './EmergencyAlertService';
 
@@ -103,8 +102,7 @@ class SmartAlertService {
       if (severity === 'critical') {
         await emergencyAlertService.sendEmergencyAlert({
           id: userId,
-          name: 'المريض',
-          bloodPressure: `${systolic}/${diastolic}`
+          name: 'المريض'
         });
       }
     }
@@ -137,7 +135,6 @@ class SmartAlertService {
         return [];
       }
 
-      // Type cast the severity field to ensure type safety
       return (data || []).map(alert => ({
         ...alert,
         severity: alert.severity as 'low' | 'medium' | 'high' | 'critical'
@@ -224,7 +221,6 @@ class SmartAlertService {
     }
   }
 
-  // إعداد الاستماع للتنبيهات الجديدة في الوقت الفعلي
   subscribeToAlerts(userId: string, callback: (alert: SmartAlert) => void) {
     const channel = supabase
       .channel('smart-alerts')

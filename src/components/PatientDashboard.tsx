@@ -11,8 +11,8 @@ import WelcomeHeader from '@/components/dashboard/WelcomeHeader';
 import CurrentHeartRateCard from '@/components/dashboard/CurrentHeartRateCard';
 import HealthStatsCards from '@/components/dashboard/HealthStatsCards';
 import HealthTipsCard from '@/components/dashboard/HealthTipsCard';
+import RealTimeAlertManager from '@/components/alerts/RealTimeAlertManager';
 import { heartRateDataService } from '@/services/HeartRateDataService';
-import { smartAlertService } from '@/services/SmartAlertService';
 
 const PatientDashboard = () => {
   const { user } = useAuth();
@@ -85,6 +85,9 @@ const PatientDashboard = () => {
       <HeartRateCard onUpdate={loadHeartRateStats} />
       
       <HealthTipsCard />
+      
+      {/* مدير التنبيهات الفورية */}
+      <RealTimeAlertManager />
     </div>
   );
 };
