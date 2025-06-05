@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useRole, UserRole } from '@/contexts/RoleContext';
+import { AuthService } from '@/services/AuthService';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
@@ -20,7 +21,7 @@ const Auth = () => {
   const [fullName, setFullName] = useState('');
   const [selectedRole, setSelectedRole] = useState<UserRole>('patient');
   const [loading, setLoading] = useState(false);
-  const { signUp, signIn, user } = useAuth();
+  const { signUp, user } = useAuth();
   const { setUserRole } = useRole();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ const Auth = () => {
 
   useEffect(() => {
     if (user) {
-      navigate('/');
+      navigate('/dashboard');
     }
   }, [user, navigate]);
 
@@ -62,20 +63,30 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
     
-    const { error } = await signIn(email, password);
-    
-    if (error) {
+    try {
+      const { error } = await AuthService.signInSafely(email, password);
+      
+      if (error) {
+        toast({
+          title: "فشل في تسجيل الدخول",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "مرحباً بعودتك!",
+          description: "تم تسجيل الدخول بنجاح.",
+        });
+        // Navigation will be handled by auth state change
+      }
+    } catch (error) {
       toast({
-        title: "فشل في تسجيل الدخول",
-        description: error.message,
+        title: "خطأ في تسجيل الدخول",
+        description: "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.",
         variant: "destructive",
       });
-    } else {
-      toast({
-        title: "مرحباً بعودتك!",
-        description: "تم تسجيل الدخول بنجاح.",
-      });
     }
+    
     setLoading(false);
   };
 

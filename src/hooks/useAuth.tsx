@@ -18,36 +18,67 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [hasRedirected, setHasRedirected] = useState(false);
 
   useEffect(() => {
+    let mounted = true;
+
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        if (!mounted) return;
+
         console.log('Auth state change:', event, session?.user?.email);
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
 
-        // إعادة التوجيه التلقائي بعد تسجيل الدخول
-        if (event === 'SIGNED_IN' && session?.user) {
+        // Handle redirect only once and avoid loops
+        if (event === 'SIGNED_IN' && session?.user && !hasRedirected) {
           console.log('User signed in, redirecting to dashboard...');
-          // استخدام setTimeout لضمان تحديث الحالة أولاً
+          setHasRedirected(true);
+          // Use setTimeout to avoid blocking the auth state update
           setTimeout(() => {
-            window.location.href = '/dashboard';
+            if (mounted && window.location.pathname === '/auth') {
+              window.location.href = '/dashboard';
+            }
           }, 100);
+        }
+
+        if (event === 'SIGNED_OUT') {
+          setHasRedirected(false);
         }
       }
     );
 
     // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('Existing session check:', session?.user?.email);
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    const checkSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error('Session check error:', error);
+        } else {
+          console.log('Existing session check:', session?.user?.email);
+          if (mounted) {
+            setSession(session);
+            setUser(session?.user ?? null);
+            setLoading(false);
+          }
+        }
+      } catch (error) {
+        console.error('Session check failed:', error);
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
 
-    return () => subscription.unsubscribe();
+    checkSession();
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signUp = async (email: string, password: string, fullName: string) => {
@@ -87,9 +118,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signOut = async () => {
     setLoading(true);
     try {
+      setHasRedirected(false);
       await supabase.auth.signOut();
       console.log('User signed out');
-      // إعادة التوجيه لصفحة المقدمة
+      // Redirect to landing page
       window.location.href = '/';
     } finally {
       setLoading(false);
