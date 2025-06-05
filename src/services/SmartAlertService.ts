@@ -8,6 +8,8 @@ export interface SmartAlert {
   alert_type: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
   message: string;
+  triggered_value?: number;
+  threshold_value?: number;
   data?: any;
   is_read: boolean;
   created_at: string;
@@ -19,24 +21,30 @@ class SmartAlertService {
     let alertType = '';
     let severity: 'low' | 'medium' | 'high' | 'critical' = 'low';
     let message = '';
+    let triggeredValue = heartRate;
+    let thresholdValue = 0;
 
     // تحليل معدل ضربات القلب
     if (heartRate < 50) {
       alertType = 'bradycardia';
       severity = heartRate < 40 ? 'critical' : 'high';
       message = `معدل ضربات القلب منخفض جداً: ${heartRate} نبضة/دقيقة`;
+      thresholdValue = 50;
     } else if (heartRate > 120) {
       alertType = 'tachycardia';
       severity = heartRate > 150 ? 'critical' : 'high';
       message = `معدل ضربات القلب مرتفع جداً: ${heartRate} نبضة/دقيقة`;
+      thresholdValue = 120;
     } else if (heartRate < 60) {
       alertType = 'low_heart_rate';
       severity = 'medium';
       message = `معدل ضربات القلب منخفض: ${heartRate} نبضة/دقيقة`;
+      thresholdValue = 60;
     } else if (heartRate > 100) {
       alertType = 'high_heart_rate';
       severity = 'medium';
       message = `معدل ضربات القلب مرتفع: ${heartRate} نبضة/دقيقة`;
+      thresholdValue = 100;
     }
 
     if (alertType) {
@@ -45,6 +53,8 @@ class SmartAlertService {
         alert_type: alertType,
         severity,
         message,
+        triggered_value: triggeredValue,
+        threshold_value: thresholdValue,
         data: { heart_rate: heartRate, timestamp: new Date().toISOString() }
       });
 
@@ -54,6 +64,47 @@ class SmartAlertService {
           id: userId,
           name: 'المريض',
           heartRate
+        });
+      }
+    }
+  }
+
+  async analyzeBloodPressureData(systolic: number, diastolic: number, userId: string): Promise<void> {
+    let alertType = '';
+    let severity: 'low' | 'medium' | 'high' | 'critical' = 'low';
+    let message = '';
+
+    // تحليل ضغط الدم
+    if (systolic >= 180 || diastolic >= 120) {
+      alertType = 'hypertensive_crisis';
+      severity = 'critical';
+      message = `أزمة ارتفاع ضغط الدم: ${systolic}/${diastolic} ملم زئبق`;
+    } else if (systolic >= 140 || diastolic >= 90) {
+      alertType = 'high_blood_pressure';
+      severity = 'high';
+      message = `ارتفاع ضغط الدم: ${systolic}/${diastolic} ملم زئبق`;
+    } else if (systolic < 90 || diastolic < 60) {
+      alertType = 'low_blood_pressure';
+      severity = 'medium';
+      message = `انخفاض ضغط الدم: ${systolic}/${diastolic} ملم زئبق`;
+    }
+
+    if (alertType) {
+      await this.createAlert({
+        user_id: userId,
+        alert_type: alertType,
+        severity,
+        message,
+        triggered_value: systolic,
+        threshold_value: alertType.includes('high') ? 140 : 90,
+        data: { systolic, diastolic, timestamp: new Date().toISOString() }
+      });
+
+      if (severity === 'critical') {
+        await emergencyAlertService.sendEmergencyAlert({
+          id: userId,
+          name: 'المريض',
+          bloodPressure: `${systolic}/${diastolic}`
         });
       }
     }
@@ -97,6 +148,27 @@ class SmartAlertService {
     }
   }
 
+  async getUnreadAlertsCount(userId: string): Promise<number> {
+    try {
+      const { count, error } = await supabase
+        .from('smart_alerts')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .eq('is_read', false)
+        .is('resolved_at', null);
+
+      if (error) {
+        console.error('Error fetching unread alerts count:', error);
+        return 0;
+      }
+
+      return count || 0;
+    } catch (error) {
+      console.error('Error fetching unread alerts count:', error);
+      return 0;
+    }
+  }
+
   async markAlertAsRead(alertId: string): Promise<void> {
     try {
       const { error } = await supabase
@@ -125,6 +197,55 @@ class SmartAlertService {
     } catch (error) {
       console.error('Error resolving alert:', error);
     }
+  }
+
+  async getCriticalAlerts(userId: string): Promise<SmartAlert[]> {
+    try {
+      const { data, error } = await supabase
+        .from('smart_alerts')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('severity', 'critical')
+        .is('resolved_at', null)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching critical alerts:', error);
+        return [];
+      }
+
+      return (data || []).map(alert => ({
+        ...alert,
+        severity: alert.severity as 'low' | 'medium' | 'high' | 'critical'
+      }));
+    } catch (error) {
+      console.error('Error fetching critical alerts:', error);
+      return [];
+    }
+  }
+
+  // إعداد الاستماع للتنبيهات الجديدة في الوقت الفعلي
+  subscribeToAlerts(userId: string, callback: (alert: SmartAlert) => void) {
+    const channel = supabase
+      .channel('smart-alerts')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'smart_alerts',
+          filter: `user_id=eq.${userId}`
+        },
+        (payload) => {
+          console.log('New alert received:', payload);
+          const alert = payload.new as SmartAlert;
+          alert.severity = alert.severity as 'low' | 'medium' | 'high' | 'critical';
+          callback(alert);
+        }
+      )
+      .subscribe();
+
+    return channel;
   }
 }
 

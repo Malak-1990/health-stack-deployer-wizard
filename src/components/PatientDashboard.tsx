@@ -12,6 +12,7 @@ import CurrentHeartRateCard from '@/components/dashboard/CurrentHeartRateCard';
 import HealthStatsCards from '@/components/dashboard/HealthStatsCards';
 import HealthTipsCard from '@/components/dashboard/HealthTipsCard';
 import { heartRateDataService } from '@/services/HeartRateDataService';
+import { smartAlertService } from '@/services/SmartAlertService';
 
 const PatientDashboard = () => {
   const { user } = useAuth();
@@ -36,7 +37,7 @@ const PatientDashboard = () => {
         setHeartRateStatus('normal');
       }
 
-      // حفظ القراءة الجديدة
+      // حفظ القراءة الجديدة مع التحليل الذكي
       heartRateDataService.saveHeartRateReading({
         heartRate: currentHeartRate
       });

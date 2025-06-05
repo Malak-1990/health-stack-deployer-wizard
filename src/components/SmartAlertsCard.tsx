@@ -1,19 +1,39 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { smartAlertService, SmartAlert } from '@/services/SmartAlertService';
-import { AlertTriangle, CheckCircle, Clock, XCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Clock, XCircle, Bell } from 'lucide-react';
 
 const SmartAlertsCard = () => {
   const { user } = useAuth();
   const [alerts, setAlerts] = useState<SmartAlert[]>([]);
   const [loading, setLoading] = useState(true);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     if (user) {
       loadAlerts();
+      loadUnreadCount();
+      
+      // إعداد الاستماع للتنبيهات الجديدة
+      const channel = smartAlertService.subscribeToAlerts(user.id, (newAlert) => {
+        setAlerts(prev => [newAlert, ...prev]);
+        setUnreadCount(prev => prev + 1);
+        
+        // تشغيل صوت تنبيه للحالات الحرجة
+        if (newAlert.severity === 'critical') {
+          playAlertSound();
+        }
+      });
+
+      return () => {
+        if (channel) {
+          channel.unsubscribe();
+        }
+      };
     }
   }, [user]);
 
@@ -26,11 +46,44 @@ const SmartAlertsCard = () => {
     setLoading(false);
   };
 
+  const loadUnreadCount = async () => {
+    if (!user) return;
+    const count = await smartAlertService.getUnreadAlertsCount(user.id);
+    setUnreadCount(count);
+  };
+
+  const playAlertSound = () => {
+    try {
+      const audio = new Audio();
+      audio.volume = 0.8;
+      
+      // إنشاء صوت تنبيه باستخدام Web Audio API
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.3);
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.5);
+    } catch (error) {
+      console.error('Error playing alert sound:', error);
+    }
+  };
+
   const handleMarkAsRead = async (alertId: string) => {
     await smartAlertService.markAlertAsRead(alertId);
     setAlerts(alerts.map(alert => 
       alert.id === alertId ? { ...alert, is_read: true } : alert
     ));
+    setUnreadCount(prev => Math.max(0, prev - 1));
   };
 
   const handleResolveAlert = async (alertId: string) => {
@@ -58,12 +111,21 @@ const SmartAlertsCard = () => {
     }
   };
 
+  const getSeverityText = (severity: string) => {
+    switch (severity) {
+      case 'critical': return 'حرج';
+      case 'high': return 'عالي';
+      case 'medium': return 'متوسط';
+      default: return 'منخفض';
+    }
+  };
+
   if (loading) {
     return (
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center">
-            <AlertTriangle className="h-5 w-5 mr-2" />
+            <Bell className="h-5 w-5 mr-2" />
             التنبيهات الذكية
           </CardTitle>
         </CardHeader>
@@ -82,11 +144,18 @@ const SmartAlertsCard = () => {
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center">
-            <AlertTriangle className="h-5 w-5 mr-2" />
+            <Bell className="h-5 w-5 mr-2" />
             التنبيهات الذكية
+            {criticalAlerts.length > 0 && (
+              <div className="mr-2 animate-pulse">
+                <AlertTriangle className="h-5 w-5 text-red-500" />
+              </div>
+            )}
           </div>
-          {unreadAlerts.length > 0 && (
-            <Badge variant="destructive">{unreadAlerts.length}</Badge>
+          {unreadCount > 0 && (
+            <Badge variant="destructive" className="animate-pulse">
+              {unreadCount}
+            </Badge>
           )}
         </CardTitle>
       </CardHeader>
@@ -94,13 +163,15 @@ const SmartAlertsCard = () => {
         {alerts.length === 0 ? (
           <p className="text-gray-500 text-center py-4">لا توجد تنبيهات</p>
         ) : (
-          <div className="space-y-3">
-            {alerts.slice(0, 5).map((alert) => (
+          <div className="space-y-3 max-h-96 overflow-y-auto">
+            {alerts.slice(0, 10).map((alert) => (
               <div
                 key={alert.id}
-                className={`p-3 rounded-lg border ${
-                  !alert.is_read ? 'bg-blue-50' : 'bg-gray-50'
-                } ${alert.resolved_at ? 'opacity-60' : ''}`}
+                className={`p-3 rounded-lg border transition-all duration-200 ${
+                  !alert.is_read ? 'bg-blue-50 border-blue-200' : 'bg-gray-50'
+                } ${alert.resolved_at ? 'opacity-60' : ''} ${
+                  alert.severity === 'critical' ? 'ring-2 ring-red-300 animate-pulse' : ''
+                }`}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -108,16 +179,24 @@ const SmartAlertsCard = () => {
                       <Badge className={getSeverityColor(alert.severity)}>
                         {getSeverityIcon(alert.severity)}
                         <span className="mr-1">
-                          {alert.severity === 'critical' ? 'حرج' :
-                           alert.severity === 'high' ? 'عالي' :
-                           alert.severity === 'medium' ? 'متوسط' : 'منخفض'}
+                          {getSeverityText(alert.severity)}
                         </span>
                       </Badge>
                       <span className="text-xs text-gray-500">
                         {new Date(alert.created_at).toLocaleString('ar-EG')}
                       </span>
+                      {alert.triggered_value && alert.threshold_value && (
+                        <span className="text-xs text-gray-600">
+                          ({alert.triggered_value} / {alert.threshold_value})
+                        </span>
+                      )}
                     </div>
-                    <p className="text-sm text-gray-700">{alert.message}</p>
+                    <p className="text-sm text-gray-700 mb-2">{alert.message}</p>
+                    {alert.data && (
+                      <div className="text-xs text-gray-500">
+                        التفاصيل: {JSON.stringify(alert.data, null, 2)}
+                      </div>
+                    )}
                   </div>
                   <div className="flex space-x-1">
                     {!alert.is_read && (
@@ -125,6 +204,7 @@ const SmartAlertsCard = () => {
                         size="sm"
                         variant="outline"
                         onClick={() => handleMarkAsRead(alert.id)}
+                        className="text-xs"
                       >
                         قراءة
                       </Button>
@@ -134,6 +214,7 @@ const SmartAlertsCard = () => {
                         size="sm"
                         variant="outline"
                         onClick={() => handleResolveAlert(alert.id)}
+                        className="text-xs"
                       >
                         حل
                       </Button>
