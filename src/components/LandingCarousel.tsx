@@ -45,7 +45,7 @@ const LandingCarousel = () => {
       id: 'hero',
       title: 'البطاقة الرئيسية',
       content: (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center relative overflow-hidden">
+        <div className="h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center relative overflow-hidden">
           {/* Background Pattern */}
           <div className="absolute inset-0 opacity-5">
             <div className="absolute top-10 left-10 w-20 h-20 bg-blue-500 rounded-full animate-ping"></div>
@@ -107,7 +107,7 @@ const LandingCarousel = () => {
       id: 'features',
       title: 'الميزات',
       content: (
-        <div className="min-h-screen bg-gradient-to-br from-white to-blue-50 flex items-center justify-center py-16">
+        <div className="h-screen bg-gradient-to-br from-white to-blue-50 flex items-center justify-center py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -126,7 +126,7 @@ const LandingCarousel = () => {
       id: 'statistics',
       title: 'الإحصائيات',
       content: (
-        <div className="min-h-screen bg-gradient-to-r from-blue-600 to-green-600 flex items-center justify-center py-16">
+        <div className="h-screen bg-gradient-to-r from-blue-600 to-green-600 flex items-center justify-center py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div className="mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
@@ -158,7 +158,7 @@ const LandingCarousel = () => {
       id: 'how-it-works',
       title: 'كيف يعمل',
       content: (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white flex items-center justify-center py-16">
+        <div className="h-screen bg-gradient-to-br from-gray-50 to-white flex items-center justify-center py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -219,7 +219,7 @@ const LandingCarousel = () => {
       id: 'cta',
       title: 'ابدأ الآن',
       content: (
-        <div className="min-h-screen bg-gradient-to-r from-red-500 to-pink-600 flex items-center justify-center py-16">
+        <div className="h-screen bg-gradient-to-r from-red-500 to-pink-600 flex items-center justify-center py-16">
           <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
               ابدأ رحلتك نحو صحة أفضل اليوم
