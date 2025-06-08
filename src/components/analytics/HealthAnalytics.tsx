@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -56,7 +55,7 @@ const HealthAnalytics = () => {
     }
   };
 
-  const generateSampleData = (range: string, baseDate: Date) => {
+  const generateSampleData = (range: string, baseDate: Date): AnalyticsData => {
     const dataPoints = range === 'daily' ? 24 : range === 'weekly' ? 7 : 12;
     const daily: any[] = [];
     const weekly: any[] = [];
@@ -92,14 +91,19 @@ const HealthAnalytics = () => {
       }
     }
 
+    // Generate trends with proper literal types
+    const heartRateRandom = Math.random();
+    const activityRandom = Math.random();
+    const overallRandom = Math.random();
+
     return {
       daily,
       weekly,
       monthly,
       trends: {
-        heartRate: Math.random() > 0.5 ? 'up' : 'stable',
-        activity: Math.random() > 0.5 ? 'up' : 'stable',
-        overall: Math.random() > 0.6 ? 'improving' : 'stable'
+        heartRate: heartRateRandom > 0.6 ? 'up' : heartRateRandom > 0.3 ? 'stable' : 'down',
+        activity: activityRandom > 0.6 ? 'up' : activityRandom > 0.3 ? 'stable' : 'down',
+        overall: overallRandom > 0.6 ? 'improving' : overallRandom > 0.3 ? 'stable' : 'declining'
       }
     };
   };

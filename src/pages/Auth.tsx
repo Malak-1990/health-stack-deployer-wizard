@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -93,10 +92,7 @@ const Auth = () => {
     }
 
     try {
-      await signUp(formData.email, formData.password, {
-        full_name: formData.fullName,
-        user_role: userRole
-      });
+      await signUp(formData.email, formData.password, formData.fullName);
       
       toast({
         title: 'تم إنشاء الحساب بنجاح',
