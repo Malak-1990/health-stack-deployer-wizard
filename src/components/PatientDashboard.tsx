@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import HeartRateCard from '@/components/HeartRateCard';
 import BluetoothConnection from '@/components/BluetoothConnection';
 import EmergencyButton from '@/components/EmergencyButton';
@@ -12,6 +13,8 @@ import CurrentHeartRateCard from '@/components/dashboard/CurrentHeartRateCard';
 import HealthStatsCards from '@/components/dashboard/HealthStatsCards';
 import HealthTipsCard from '@/components/dashboard/HealthTipsCard';
 import RealTimeAlertManager from '@/components/alerts/RealTimeAlertManager';
+import HealthAnalytics from '@/components/analytics/HealthAnalytics';
+import LongTermDataHistory from '@/components/dashboard/LongTermDataHistory';
 import { heartRateDataService } from '@/services/HeartRateDataService';
 
 const PatientDashboard = () => {
@@ -68,23 +71,44 @@ const PatientDashboard = () => {
       
       <SmartAlertsCard />
       
-      <CurrentHeartRateCard 
-        currentHeartRate={currentHeartRate}
-        heartRateStatus={heartRateStatus}
-      />
-      
-      <BluetoothConnection onHeartRateUpdate={handleHeartRateUpdate} />
-      
-      <DeviceManager />
-      
-      <HealthStatsCards 
-        heartRateStats={heartRateStats}
-        currentHeartRate={currentHeartRate}
-      />
-      
-      <HeartRateCard onUpdate={loadHeartRateStats} />
-      
-      <HealthTipsCard />
+      <Tabs defaultValue="overview" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="overview">نظرة عامة</TabsTrigger>
+          <TabsTrigger value="monitoring">المراقبة</TabsTrigger>
+          <TabsTrigger value="analytics">التحليلات</TabsTrigger>
+          <TabsTrigger value="history">السجل</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-6">
+          <CurrentHeartRateCard 
+            currentHeartRate={currentHeartRate}
+            heartRateStatus={heartRateStatus}
+          />
+          
+          <HealthStatsCards 
+            heartRateStats={heartRateStats}
+            currentHeartRate={currentHeartRate}
+          />
+          
+          <HealthTipsCard />
+        </TabsContent>
+
+        <TabsContent value="monitoring" className="space-y-6">
+          <BluetoothConnection onHeartRateUpdate={handleHeartRateUpdate} />
+          
+          <DeviceManager />
+          
+          <HeartRateCard onUpdate={loadHeartRateStats} />
+        </TabsContent>
+
+        <TabsContent value="analytics">
+          <HealthAnalytics />
+        </TabsContent>
+
+        <TabsContent value="history">
+          <LongTermDataHistory />
+        </TabsContent>
+      </Tabs>
       
       {/* مدير التنبيهات الفورية */}
       <RealTimeAlertManager />

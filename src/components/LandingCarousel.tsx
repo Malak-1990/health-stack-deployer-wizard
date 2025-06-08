@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +9,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  CarouselApi,
 } from '@/components/ui/carousel';
 import { Heart, Users, Shield, Activity, ArrowRight, Star, CheckCircle, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -18,6 +19,22 @@ import AnimatedFeatureCards from '@/components/AnimatedFeatureCards';
 const LandingCarousel = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(0);
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!api) {
+      return;
+    }
+
+    setCount(api.scrollSnapList().length);
+    setCurrent(api.selectedScrollSnap() + 1);
+
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap() + 1);
+    });
+  }, [api]);
 
   const handleGetStarted = () => {
     navigate('/auth');
@@ -222,25 +239,40 @@ const LandingCarousel = () => {
 
   return (
     <div className="relative">
-      <Carousel className="w-full" orientation="horizontal">
-        <CarouselContent>
+      <Carousel 
+        className="w-full" 
+        orientation="horizontal"
+        setApi={setApi}
+        opts={{
+          align: "start",
+          loop: true,
+        }}
+      >
+        <CarouselContent className="-ml-1">
           {slides.map((slide) => (
-            <CarouselItem key={slide.id}>
-              {slide.content}
+            <CarouselItem key={slide.id} className="pl-1">
+              <div className="p-1">
+                {slide.content}
+              </div>
             </CarouselItem>
           ))}
         </CarouselContent>
         
         {/* Navigation */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-4 z-10">
-          <CarouselPrevious className="bg-white/90 hover:bg-white shadow-lg" />
-          <CarouselNext className="bg-white/90 hover:bg-white shadow-lg" />
+          <CarouselPrevious className="bg-white/90 hover:bg-white shadow-lg border-0 h-12 w-12" />
+          <CarouselNext className="bg-white/90 hover:bg-white shadow-lg border-0 h-12 w-12" />
         </div>
         
         {/* Slide Indicators */}
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
           {slides.map((_, index) => (
-            <div key={index} className="w-2 h-2 rounded-full bg-white/50" />
+            <div 
+              key={index} 
+              className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                current === index + 1 ? 'bg-white' : 'bg-white/50'
+              }`} 
+            />
           ))}
         </div>
       </Carousel>
