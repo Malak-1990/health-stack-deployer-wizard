@@ -15,6 +15,10 @@ import HealthTipsCard from '@/components/dashboard/HealthTipsCard';
 import RealTimeAlertManager from '@/components/alerts/RealTimeAlertManager';
 import HealthAnalytics from '@/components/analytics/HealthAnalytics';
 import LongTermDataHistory from '@/components/dashboard/LongTermDataHistory';
+import PatientProfile from '@/components/patient/PatientProfile';
+import AppointmentScheduler from '@/components/appointments/AppointmentScheduler';
+import HealthRecommendations from '@/components/recommendations/HealthRecommendations';
+import MedicalReports from '@/components/reports/MedicalReports';
 import { heartRateDataService } from '@/services/HeartRateDataService';
 
 const PatientDashboard = () => {
@@ -72,11 +76,15 @@ const PatientDashboard = () => {
       <SmartAlertsCard />
       
       <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="overview">نظرة عامة</TabsTrigger>
           <TabsTrigger value="monitoring">المراقبة</TabsTrigger>
           <TabsTrigger value="analytics">التحليلات</TabsTrigger>
           <TabsTrigger value="history">السجل</TabsTrigger>
+          <TabsTrigger value="profile">الملف الشخصي</TabsTrigger>
+          <TabsTrigger value="appointments">المواعيد</TabsTrigger>
+          <TabsTrigger value="recommendations">التوصيات</TabsTrigger>
+          <TabsTrigger value="reports">التقارير</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -107,6 +115,22 @@ const PatientDashboard = () => {
 
         <TabsContent value="history">
           <LongTermDataHistory />
+        </TabsContent>
+
+        <TabsContent value="profile">
+          <PatientProfile />
+        </TabsContent>
+
+        <TabsContent value="appointments">
+          <AppointmentScheduler />
+        </TabsContent>
+
+        <TabsContent value="recommendations">
+          <HealthRecommendations />
+        </TabsContent>
+
+        <TabsContent value="reports">
+          <MedicalReports />
         </TabsContent>
       </Tabs>
       
