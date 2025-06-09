@@ -13,6 +13,7 @@ import Dashboard from "./components/Dashboard";
 import PatientDashboardPage from "./pages/PatientDashboardPage";
 import DoctorDashboardPage from "./pages/DoctorDashboardPage";
 import FamilyDashboardPage from "./pages/FamilyDashboardPage";
+import AdminDashboard from "./pages/AdminDashboard";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -49,6 +50,11 @@ const App = () => (
                 <Route path="/family-dashboard" element={
                   <ProtectedRoute>
                     <FamilyDashboardPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin-dashboard" element={
+                  <ProtectedRoute>
+                    <AdminDashboard />
                   </ProtectedRoute>
                 } />
                 <Route path="/settings" element={

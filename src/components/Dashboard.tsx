@@ -2,14 +2,43 @@
 import { useRole } from '@/contexts/RoleContext';
 import { useAuth } from '@/hooks/useAuth';
 import { Navigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 const Dashboard = () => {
-  const { userRole } = useRole();
+  const { userRole, setUserRole } = useRole();
   const { user, loading } = useAuth();
+  const [userDbRole, setUserDbRole] = useState<string | null>(null);
+  const [checkingRole, setCheckingRole] = useState(true);
+
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      if (user) {
+        try {
+          const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+
+          if (error) {
+            console.error('Error fetching user role:', error);
+          } else if (profile) {
+            setUserDbRole(profile.role);
+            setUserRole(profile.role as any);
+          }
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      }
+      setCheckingRole(false);
+    };
+
+    fetchUserRole();
+  }, [user, setUserRole]);
 
   // Show loading while auth is being determined
-  if (loading) {
+  if (loading || checkingRole) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
@@ -22,13 +51,18 @@ const Dashboard = () => {
     return <Navigate to="/auth" replace />;
   }
 
-  // Route based on user role
-  switch (userRole) {
+  // Route based on user role from database
+  const roleToRoute = userDbRole || userRole;
+  
+  switch (roleToRoute) {
+    case 'admin':
+      return <Navigate to="/admin-dashboard" replace />;
     case 'doctor':
       return <Navigate to="/doctor-dashboard" replace />;
     case 'family':
       return <Navigate to="/family-dashboard" replace />;
     case 'patient':
+    case 'user':
     default:
       return <Navigate to="/patient-dashboard" replace />;
   }
