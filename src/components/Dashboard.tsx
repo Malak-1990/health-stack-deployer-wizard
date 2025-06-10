@@ -26,9 +26,9 @@ const Dashboard = () => {
             // If role column doesn't exist yet, default to user
             setUserDbRole('user');
             setUserRole('patient');
-          } else if (profile && profile.role) {
-            setUserDbRole(profile.role);
-            setUserRole(profile.role as any);
+          } else if (profile && (profile as any).role) {
+            setUserDbRole((profile as any).role);
+            setUserRole((profile as any).role as any);
           } else {
             // Fallback to user if no role found
             setUserDbRole('user');
