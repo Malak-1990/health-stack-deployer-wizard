@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRole } from '@/contexts/RoleContext';
@@ -63,7 +62,7 @@ const AdminDashboard = () => {
       throw new Error('No access token available');
     }
 
-    const url = new URL(`${supabase.supabaseUrl}/functions/v1/admin-data-access`);
+    const url = new URL('https://uzxjjuursjgymtgfkgxd.supabase.co/functions/v1/admin-data-access');
     url.searchParams.set('action', action);
 
     const response = await fetch(url.toString(), {

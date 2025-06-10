@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-export type UserRole = 'patient' | 'doctor' | 'family';
+export type UserRole = 'patient' | 'doctor' | 'family' | 'admin';
 
 interface RoleContextType {
   userRole: UserRole;
@@ -12,6 +12,7 @@ interface RoleContextType {
     canViewMedicalRecords: boolean;
     canCreateAppointments: boolean;
     canManageEmergencyContacts: boolean;
+    canAccessAdminDashboard: boolean;
   };
 }
 
@@ -22,6 +23,15 @@ export const RoleProvider = ({ children }: { children: ReactNode }) => {
 
   const getPermissions = (role: UserRole) => {
     switch (role) {
+      case 'admin':
+        return {
+          canViewAllPatients: true,
+          canEditPatients: true,
+          canViewMedicalRecords: true,
+          canCreateAppointments: true,
+          canManageEmergencyContacts: true,
+          canAccessAdminDashboard: true,
+        };
       case 'doctor':
         return {
           canViewAllPatients: true,
@@ -29,6 +39,7 @@ export const RoleProvider = ({ children }: { children: ReactNode }) => {
           canViewMedicalRecords: true,
           canCreateAppointments: true,
           canManageEmergencyContacts: true,
+          canAccessAdminDashboard: false,
         };
       case 'family':
         return {
@@ -37,6 +48,7 @@ export const RoleProvider = ({ children }: { children: ReactNode }) => {
           canViewMedicalRecords: true,
           canCreateAppointments: false,
           canManageEmergencyContacts: true,
+          canAccessAdminDashboard: false,
         };
       case 'patient':
       default:
@@ -46,6 +58,7 @@ export const RoleProvider = ({ children }: { children: ReactNode }) => {
           canViewMedicalRecords: true,
           canCreateAppointments: true,
           canManageEmergencyContacts: false,
+          canAccessAdminDashboard: false,
         };
     }
   };
