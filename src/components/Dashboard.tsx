@@ -23,12 +23,12 @@ const Dashboard = () => {
 
           if (error) {
             console.error('Error fetching user role:', error);
-            // If role column doesn't exist yet, default to user
+            // If there's an error, default to user
             setUserDbRole('user');
             setUserRole('patient');
-          } else if (profile && (profile as any).role) {
-            setUserDbRole((profile as any).role);
-            setUserRole((profile as any).role as any);
+          } else if (profile && profile.role) {
+            setUserDbRole(profile.role);
+            setUserRole(profile.role as any);
           } else {
             // Fallback to user if no role found
             setUserDbRole('user');
