@@ -28,7 +28,22 @@ const Dashboard = () => {
             setUserRole('patient');
           } else if (profile && profile.role) {
             setUserDbRole(profile.role);
-            setUserRole(profile.role as any);
+            // Map database roles to frontend roles
+            switch (profile.role) {
+              case 'admin':
+                setUserRole('admin');
+                break;
+              case 'doctor':
+                setUserRole('doctor');
+                break;
+              case 'family':
+                setUserRole('family');
+                break;
+              case 'user':
+              default:
+                setUserRole('patient');
+                break;
+            }
           } else {
             // Fallback to user if no role found
             setUserDbRole('user');
@@ -49,8 +64,11 @@ const Dashboard = () => {
   // Show loading while auth is being determined
   if (loading || checkingRole) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">جاري التحميل...</p>
+        </div>
       </div>
     );
   }
@@ -62,6 +80,8 @@ const Dashboard = () => {
 
   // Route based on user role from database
   const roleToRoute = userDbRole || userRole;
+  
+  console.log('Redirecting user with role:', roleToRoute);
   
   switch (roleToRoute) {
     case 'admin':

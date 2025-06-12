@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,8 +6,6 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
   CarouselApi,
 } from '@/components/ui/carousel';
 import { Heart, Users, Shield, Activity, ArrowRight, Star, CheckCircle, Globe } from 'lucide-react';
@@ -36,8 +33,31 @@ const LandingCarousel = () => {
     });
   }, [api]);
 
+  // الاستماع للأحداث من Navigation
+  useEffect(() => {
+    const handleScrollToSection = (event: CustomEvent) => {
+      const sectionId = event.detail;
+      scrollToSection(sectionId);
+    };
+
+    window.addEventListener('scrollToSection', handleScrollToSection as EventListener);
+    
+    return () => {
+      window.removeEventListener('scrollToSection', handleScrollToSection as EventListener);
+    };
+  }, [api]);
+
   const handleGetStarted = () => {
     navigate('/auth');
+  };
+
+  const scrollToSection = (sectionId: string) => {
+    if (api) {
+      const sectionIndex = slides.findIndex(slide => slide.id === sectionId);
+      if (sectionIndex !== -1) {
+        api.scrollTo(sectionIndex);
+      }
+    }
   };
 
   const slides = [
@@ -73,12 +93,25 @@ const LandingCarousel = () => {
               <span className="text-blue-600 font-medium">مع تنبيهات فورية وحماية متقدمة للبيانات</span>
             </p>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+            {/* Navigation Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
               <Button size="lg" onClick={handleGetStarted} className="group">
                 ابدأ الآن
                 <ArrowRight className="mr-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Button>
+              <Button variant="outline" size="lg" onClick={() => scrollToSection('features')}>
+                المميزات
+              </Button>
+              <Button variant="outline" size="lg" onClick={() => scrollToSection('how-it-works')}>
+                كيف يعمل
+              </Button>
+              <Button variant="outline" size="lg" onClick={() => scrollToSection('statistics')}>
+                الإحصائيات
+              </Button>
+            </div>
+
+            {/* CTA Button */}
+            <div className="mb-12">
               <Button variant="outline" size="lg" onClick={() => navigate('/auth')}>
                 تسجيل دخول
               </Button>
@@ -118,6 +151,12 @@ const LandingCarousel = () => {
               </p>
             </div>
             <AnimatedFeatureCards />
+            
+            <div className="text-center mt-8">
+              <Button onClick={handleGetStarted} size="lg">
+                ابدأ الاستخدام الآن
+              </Button>
+            </div>
           </div>
         </div>
       )
@@ -137,7 +176,7 @@ const LandingCarousel = () => {
               </p>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
               {[
                 { value: '1000+', label: 'مستخدمين' },
                 { value: '500+', label: 'المرضى المراقبين' },
@@ -150,6 +189,10 @@ const LandingCarousel = () => {
                 </div>
               ))}
             </div>
+            
+            <Button onClick={handleGetStarted} size="lg" variant="secondary">
+              انضم إلينا الآن
+            </Button>
           </div>
         </div>
       )
@@ -169,7 +212,7 @@ const LandingCarousel = () => {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
               {[
                 {
                   step: "1",
@@ -210,6 +253,12 @@ const LandingCarousel = () => {
                   </Card>
                 );
               })}
+            </div>
+            
+            <div className="text-center">
+              <Button onClick={handleGetStarted} size="lg">
+                ابدأ الآن
+              </Button>
             </div>
           </div>
         </div>
@@ -258,20 +307,15 @@ const LandingCarousel = () => {
           ))}
         </CarouselContent>
         
-        {/* Navigation */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-4 z-10">
-          <CarouselPrevious className="bg-white/90 hover:bg-white shadow-lg border-0 h-12 w-12" />
-          <CarouselNext className="bg-white/90 hover:bg-white shadow-lg border-0 h-12 w-12" />
-        </div>
-        
         {/* Slide Indicators */}
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
           {slides.map((_, index) => (
-            <div 
-              key={index} 
+            <button
+              key={index}
+              onClick={() => api?.scrollTo(index)}
               className={`w-3 h-3 rounded-full transition-all duration-300 ${
                 current === index + 1 ? 'bg-white' : 'bg-white/50'
-              }`} 
+              }`}
             />
           ))}
         </div>

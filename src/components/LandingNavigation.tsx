@@ -1,70 +1,126 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Heart, Globe } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Heart, Menu, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Badge } from '@/components/ui/badge';
 
 const LandingNavigation = () => {
-  const { language, setLanguage, t, direction } = useLanguage();
+  const navigate = useNavigate();
+  const { direction } = useLanguage();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const toggleLanguage = () => {
-    setLanguage(language === 'ar' ? 'en' : 'ar');
+  const scrollToSection = (sectionId: string) => {
+    // إرسال حدث مخصص للكاروسيل ليتعامل معه
+    window.dispatchEvent(new CustomEvent('scrollToSection', { detail: sectionId }));
+    setIsMenuOpen(false);
   };
 
-  const navigationItems = [
-    { id: 'hero', label: 'الرئيسية', href: '#hero' },
-    { id: 'features', label: 'الميزات', href: '#features' },
-    { id: 'statistics', label: 'الإحصائيات', href: '#statistics' },
-    { id: 'how-it-works', label: 'كيف يعمل', href: '#how-it-works' },
-    { id: 'cta', label: 'ابدأ الآن', href: '#cta' }
+  const navItems = [
+    { label: 'الرئيسية', action: () => scrollToSection('hero') },
+    { label: 'المميزات', action: () => scrollToSection('features') },
+    { label: 'كيف يعمل', action: () => scrollToSection('how-it-works') },
+    { label: 'الإحصائيات', action: () => scrollToSection('statistics') },
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm shadow-sm z-50">
+    <nav className={`fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm shadow-sm ${direction === 'rtl' ? 'font-cairo' : ''}`} dir={direction}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 rtl:space-x-reverse">
             <div className="p-2 bg-red-100 rounded-lg">
               <Heart className="h-6 w-6 text-red-600" />
             </div>
-            <div className={direction === 'rtl' ? 'mr-3' : 'ml-3'}>
-              <h1 className="text-xl font-semibold text-gray-900">
-                نظام مراقبة مرضى القلب
+            <div>
+              <h1 className="text-lg font-bold text-gray-900">
+                نظام مراقبة القلب
               </h1>
-              <p className="text-sm text-gray-600">جامعة الزاوية</p>
+              <Badge variant="outline" className="text-xs">
+                نسخة تجريبية
+              </Badge>
             </div>
           </div>
 
-          {/* Navigation Menu - Hidden on mobile */}
-          <nav className="hidden md:flex items-center space-x-6">
-            {navigationItems.map((item) => (
-              <a
-                key={item.id}
-                href={item.href}
-                className="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium"
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8 rtl:space-x-reverse">
+            {navItems.map((item, index) => (
+              <button
+                key={index}
+                onClick={item.action}
+                className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors hover:bg-gray-50 rounded-md"
               >
                 {item.label}
-              </a>
+              </button>
             ))}
-          </nav>
+          </div>
 
-          {/* Actions */}
-          <div className="flex items-center space-x-4">
-            <Button variant="outline" size="sm" onClick={toggleLanguage}>
-              <Globe className="h-4 w-4 mr-2" />
-              {language === 'ar' ? 'English' : 'العربية'}
+          {/* Desktop Action Buttons */}
+          <div className="hidden md:flex items-center space-x-4 rtl:space-x-reverse">
+            <Button variant="outline" onClick={() => navigate('/auth')}>
+              تسجيل دخول
             </Button>
-            <Link to="/auth">
-              <Button size="sm">
-                {t('signin')}
-              </Button>
-            </Link>
+            <Button onClick={() => navigate('/auth')}>
+              ابدأ الآن
+            </Button>
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="md:hidden">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              {isMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </Button>
           </div>
         </div>
+
+        {/* Mobile Navigation Menu */}
+        {isMenuOpen && (
+          <div className="md:hidden">
+            <div className="px-2 pt-2 pb-3 space-y-1 bg-white rounded-lg shadow-lg mt-2">
+              {navItems.map((item, index) => (
+                <button
+                  key={index}
+                  onClick={item.action}
+                  className="block w-full text-right px-3 py-2 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+                >
+                  {item.label}
+                </button>
+              ))}
+              <div className="pt-4 space-y-2">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    navigate('/auth');
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  تسجيل دخول
+                </Button>
+                <Button
+                  className="w-full"
+                  onClick={() => {
+                    navigate('/auth');
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  ابدأ الآن
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-    </header>
+    </nav>
   );
 };
 
