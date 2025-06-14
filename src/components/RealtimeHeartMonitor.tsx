@@ -65,7 +65,13 @@ const RealtimeHeartMonitor: React.FC = () => {
           .limit(10);
 
         if (alertsError) throw alertsError;
-        setSmartAlerts(initialAlerts || []);
+        
+        // Type cast the severity field to match our interface
+        const typedAlerts = (initialAlerts || []).map(alert => ({
+          ...alert,
+          severity: alert.severity as 'low' | 'medium' | 'high' | 'critical'
+        }));
+        setSmartAlerts(typedAlerts);
 
       } catch (err: any) {
         console.error('Error fetching initial data:', err.message);
@@ -112,10 +118,14 @@ const RealtimeHeartMonitor: React.FC = () => {
         },
         (payload) => {
           console.log('Realtime Smart Alert Insert:', payload);
-          setSmartAlerts((prevAlerts) => [payload.new as SmartAlert, ...prevAlerts]);
+          const newAlert = {
+            ...payload.new,
+            severity: payload.new.severity as 'low' | 'medium' | 'high' | 'critical'
+          } as SmartAlert;
+          
+          setSmartAlerts((prevAlerts) => [newAlert, ...prevAlerts]);
 
           // تشغيل صوت تنبيه للحالات الحرجة
-          const newAlert = payload.new as SmartAlert;
           if (newAlert.severity === 'critical') {
             console.warn('تنبيه حرج جديد!');
             // يمكن إضافة صوت تنبيه هنا
@@ -139,9 +149,14 @@ const RealtimeHeartMonitor: React.FC = () => {
         },
         (payload) => {
           console.log('Realtime Smart Alert Update:', payload);
+          const updatedAlert = {
+            ...payload.new,
+            severity: payload.new.severity as 'low' | 'medium' | 'high' | 'critical'
+          } as SmartAlert;
+          
           setSmartAlerts((prevAlerts) =>
             prevAlerts.map((alert) =>
-              alert.id === payload.old.id ? (payload.new as SmartAlert) : alert
+              alert.id === payload.old.id ? updatedAlert : alert
             )
           );
         }
