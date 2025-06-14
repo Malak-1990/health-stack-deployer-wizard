@@ -7,9 +7,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Users, Heart, AlertTriangle, Activity, Database, TrendingUp } from 'lucide-react';
+import { Users, Heart, AlertTriangle, Activity, Database, TrendingUp, Settings } from 'lucide-react';
 import { adminService } from '@/services/AdminService';
 import { useToast } from '@/hooks/use-toast';
+import AdminUserManager from '@/components/AdminUserManager';
 
 interface AdminStats {
   totalUsers: number;
@@ -82,28 +83,13 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleRoleUpdate = async (userId: string, newRole: string) => {
-    try {
-      await adminService.updateUserRole(userId, newRole);
-      toast({
-        title: 'نجح التحديث',
-        description: 'تم تحديث دور المستخدم بنجاح'
-      });
-      loadAdminData(); // Refresh data
-    } catch (error) {
-      console.error('Error updating role:', error);
-      toast({
-        title: 'خطأ',
-        description: 'فشل في تحديث دور المستخدم',
-        variant: 'destructive'
-      });
-    }
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">جاري تحميل لوحة تحكم المشرف...</p>
+        </div>
       </div>
     );
   }
@@ -114,6 +100,10 @@ const AdminDashboard = () => {
       <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg p-6 text-white">
         <h1 className="text-2xl font-bold mb-2">لوحة تحكم المشرف</h1>
         <p className="text-purple-100">إدارة شاملة للنظام والمستخدمين</p>
+        <div className="mt-4 text-sm bg-white/10 p-3 rounded-lg">
+          <p><strong>مرحباً:</strong> {user?.email}</p>
+          <p><strong>الدور:</strong> مشرف النظام</p>
+        </div>
       </div>
 
       {/* Statistics */}
@@ -173,51 +163,15 @@ const AdminDashboard = () => {
 
       {/* Main Content */}
       <Tabs defaultValue="users" className="space-y-4">
-        <TabsList>
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="users">المستخدمون</TabsTrigger>
           <TabsTrigger value="alerts">التنبيهات</TabsTrigger>
           <TabsTrigger value="system">النظام</TabsTrigger>
+          <TabsTrigger value="settings">الإعدادات</TabsTrigger>
         </TabsList>
 
         <TabsContent value="users">
-          <Card>
-            <CardHeader>
-              <CardTitle>إدارة المستخدمين</CardTitle>
-              <CardDescription>عرض وإدارة جميع المستخدمين في النظام</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {users.map((user) => (
-                  <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <h4 className="font-semibold">{user.full_name || 'بدون اسم'}</h4>
-                      <p className="text-sm text-gray-600">تاريخ التسجيل: {new Date(user.created_at).toLocaleDateString('ar-EG')}</p>
-                      {user.emergency_contact_name && (
-                        <p className="text-sm text-gray-600">جهة الاتصال: {user.emergency_contact_name}</p>
-                      )}
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
-                        {user.role === 'admin' ? 'مشرف' : 
-                         user.role === 'doctor' ? 'طبيب' : 
-                         user.role === 'family' ? 'عائلة' : 'مريض'}
-                      </Badge>
-                      <select 
-                        value={user.role} 
-                        onChange={(e) => handleRoleUpdate(user.id, e.target.value)}
-                        className="text-sm border rounded px-2 py-1 mr-2"
-                      >
-                        <option value="user">مريض</option>
-                        <option value="doctor">طبيب</option>
-                        <option value="family">عائلة</option>
-                        <option value="admin">مشرف</option>
-                      </select>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <AdminUserManager />
         </TabsContent>
 
         <TabsContent value="alerts">
@@ -228,23 +182,29 @@ const AdminDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {alerts.map((alert) => (
-                  <div key={alert.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <h4 className="font-semibold">{alert.message}</h4>
-                      <p className="text-sm text-gray-600">
-                        المستخدم: {alert.profiles.full_name || 'غير محدد'}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        {new Date(alert.created_at).toLocaleString('ar-EG')}
-                      </p>
-                    </div>
-                    <Badge variant={alert.severity === 'critical' ? 'destructive' : 'secondary'}>
-                      {alert.severity === 'critical' ? 'حرج' : 
-                       alert.severity === 'warning' ? 'تحذير' : 'معلومات'}
-                    </Badge>
+                {alerts.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    لا توجد تنبيهات حالياً
                   </div>
-                ))}
+                ) : (
+                  alerts.map((alert) => (
+                    <div key={alert.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div>
+                        <h4 className="font-semibold">{alert.message}</h4>
+                        <p className="text-sm text-gray-600">
+                          المستخدم: {alert.profiles.full_name || 'غير محدد'}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {new Date(alert.created_at).toLocaleString('ar-EG')}
+                        </p>
+                      </div>
+                      <Badge variant={alert.severity === 'critical' ? 'destructive' : 'secondary'}>
+                        {alert.severity === 'critical' ? 'حرج' : 
+                         alert.severity === 'warning' ? 'تحذير' : 'معلومات'}
+                      </Badge>
+                    </div>
+                  ))
+                )}
               </div>
             </CardContent>
           </Card>
@@ -268,9 +228,69 @@ const AdminDashboard = () => {
                   </p>
                 </div>
                 
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <h5 className="font-semibold text-blue-800 mb-2">قاعدة البيانات</h5>
+                    <p className="text-blue-700 text-sm">
+                      جميع الجداول محمية بـ Row Level Security (RLS)
+                    </p>
+                  </div>
+                  
+                  <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                    <h5 className="font-semibold text-purple-800 mb-2">المصادقة</h5>
+                    <p className="text-purple-700 text-sm">
+                      نظام مصادقة آمن مع دعم الأدوار المتعددة
+                    </p>
+                  </div>
+                </div>
+                
                 <Button onClick={loadAdminData} className="w-full">
                   تحديث البيانات
                 </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="settings">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Settings className="h-5 w-5" />
+                إعدادات المشرف
+              </CardTitle>
+              <CardDescription>إعدادات متقدمة لإدارة النظام</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <h5 className="font-semibold text-yellow-800 mb-2">⚠️ تحذير هام</h5>
+                  <p className="text-yellow-700 text-sm">
+                    التعديلات في هذا القسم تؤثر على النظام بالكامل. يُرجى الحذر عند إجراء أي تغييرات.
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 border rounded-lg">
+                    <h6 className="font-semibold mb-2">إدارة النسخ الاحتياطية</h6>
+                    <p className="text-sm text-gray-600 mb-3">
+                      إنشاء وإدارة النسخ الاحتياطية لقاعدة البيانات
+                    </p>
+                    <Button variant="outline" size="sm" disabled>
+                      قريباً
+                    </Button>
+                  </div>
+                  
+                  <div className="p-4 border rounded-lg">
+                    <h6 className="font-semibold mb-2">تحليلات النظام</h6>
+                    <p className="text-sm text-gray-600 mb-3">
+                      تقارير مفصلة عن استخدام النظام والأداء
+                    </p>
+                    <Button variant="outline" size="sm" disabled>
+                      قريباً
+                    </Button>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>

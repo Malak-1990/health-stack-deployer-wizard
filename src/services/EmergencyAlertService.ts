@@ -1,4 +1,3 @@
-
 import { locationService, LocationData } from './LocationService';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -58,18 +57,23 @@ class EmergencyAlertService {
     try {
       const { error } = await supabase
         .from('smart_alerts')
-        .insert([{
+        .insert({
           user_id: alert.patientId,
           alert_type: 'emergency',
           severity: alert.severity,
           message: alert.message,
           data: {
-            location: alert.location,
+            location: {
+              latitude: alert.location.latitude,
+              longitude: alert.location.longitude,
+              accuracy: alert.location.accuracy,
+              timestamp: alert.location.timestamp
+            },
             heart_rate: alert.heartRate,
             timestamp: alert.timestamp.toISOString(),
             emergency_type: 'user_triggered'
           }
-        }]);
+        });
 
       if (error) {
         console.error('Error storing emergency alert:', error);

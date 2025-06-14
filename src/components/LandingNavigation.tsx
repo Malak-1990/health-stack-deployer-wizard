@@ -1,126 +1,264 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Heart, Menu, X } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { Badge } from '@/components/ui/badge';
+import { Menu, X, Heart, Shield, BarChart3, Users, Smartphone, FileText } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 
 const LandingNavigation = () => {
-  const navigate = useNavigate();
-  const { direction } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const scrollToSection = (sectionId: string) => {
-    // إرسال حدث مخصص للكاروسيل ليتعامل معه
-    window.dispatchEvent(new CustomEvent('scrollToSection', { detail: sectionId }));
-    setIsMenuOpen(false);
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      setIsMenuOpen(false);
+    }
   };
 
-  const navItems = [
-    { label: 'الرئيسية', action: () => scrollToSection('hero') },
-    { label: 'المميزات', action: () => scrollToSection('features') },
-    { label: 'كيف يعمل', action: () => scrollToSection('how-it-works') },
-    { label: 'الإحصائيات', action: () => scrollToSection('statistics') },
+  const features = [
+    {
+      id: 'monitoring',
+      title: 'مراقبة مستمرة',
+      description: 'مراقبة معدل ضربات القلب وضغط الدم على مدار الساعة',
+      icon: Heart,
+      color: 'text-red-600',
+    },
+    {
+      id: 'alerts',
+      title: 'تنبيهات ذكية',
+      description: 'إشعارات فورية عند اكتشاف أي مشاكل صحية',
+      icon: Shield,
+      color: 'text-blue-600',
+    },
+    {
+      id: 'analytics',
+      title: 'تحليلات متقدمة',
+      description: 'رسوم بيانية وإحصائيات مفصلة لحالتك الصحية',
+      icon: BarChart3,
+      color: 'text-green-600',
+    },
+    {
+      id: 'family',
+      title: 'مشاركة العائلة',
+      description: 'إشراك أفراد العائلة في متابعة حالتك الصحية',
+      icon: Users,
+      color: 'text-purple-600',
+    },
+  ];
+
+  const stats = [
+    { number: '10,000+', label: 'مستخدم نشط' },
+    { number: '99.9%', label: 'موثوقية النظام' },
+    { number: '24/7', label: 'مراقبة مستمرة' },
+    { number: '5★', label: 'تقييم المستخدمين' },
   ];
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm shadow-sm ${direction === 'rtl' ? 'font-cairo' : ''}`} dir={direction}>
+    <div className="bg-white shadow-sm relative z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center py-4">
           {/* Logo */}
-          <div className="flex items-center space-x-3 rtl:space-x-reverse">
-            <div className="p-2 bg-red-100 rounded-lg">
+          <div className="flex items-center space-x-2 rtl:space-x-reverse">
+            <div className="p-2 bg-red-100 rounded-full">
               <Heart className="h-6 w-6 text-red-600" />
             </div>
-            <div>
-              <h1 className="text-lg font-bold text-gray-900">
-                نظام مراقبة القلب
-              </h1>
-              <Badge variant="outline" className="text-xs">
-                نسخة تجريبية
-              </Badge>
-            </div>
+            <span className="text-xl font-bold text-gray-900">نظام مراقبة القلب</span>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8 rtl:space-x-reverse">
-            {navItems.map((item, index) => (
-              <button
-                key={index}
-                onClick={item.action}
-                className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors hover:bg-gray-50 rounded-md"
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Desktop Action Buttons */}
-          <div className="hidden md:flex items-center space-x-4 rtl:space-x-reverse">
-            <Button variant="outline" onClick={() => navigate('/auth')}>
-              تسجيل دخول
-            </Button>
-            <Button onClick={() => navigate('/auth')}>
-              ابدأ الآن
-            </Button>
-          </div>
-
-          {/* Mobile menu button */}
-          <div className="md:hidden">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
+          <nav className="hidden md:flex items-center space-x-8 rtl:space-x-reverse">
+            <button
+              onClick={() => scrollToSection('features')}
+              className="text-gray-600 hover:text-gray-900 font-medium transition-colors"
             >
-              {isMenuOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
-            </Button>
+              المميزات
+            </button>
+            <button
+              onClick={() => scrollToSection('how-it-works')}
+              className="text-gray-600 hover:text-gray-900 font-medium transition-colors"
+            >
+              كيف يعمل
+            </button>
+            <button
+              onClick={() => scrollToSection('statistics')}
+              className="text-gray-600 hover:text-gray-900 font-medium transition-colors"
+            >
+              الإحصائيات
+            </button>
+            <button
+              onClick={() => scrollToSection('about')}
+              className="text-gray-600 hover:text-gray-900 font-medium transition-colors"
+            >
+              حول النظام
+            </button>
+          </nav>
+
+          {/* Action Buttons */}
+          <div className="hidden md:flex items-center space-x-4 rtl:space-x-reverse">
+            <Link to="/auth">
+              <Button variant="outline">تسجيل الدخول</Button>
+            </Link>
+            <Link to="/auth?tab=signup">
+              <Button>ابدأ الآن</Button>
+            </Link>
           </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+          >
+            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
         </div>
 
-        {/* Mobile Navigation Menu */}
+        {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 bg-white rounded-lg shadow-lg mt-2">
-              {navItems.map((item, index) => (
-                <button
-                  key={index}
-                  onClick={item.action}
-                  className="block w-full text-right px-3 py-2 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
-                >
-                  {item.label}
-                </button>
-              ))}
-              <div className="pt-4 space-y-2">
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => {
-                    navigate('/auth');
-                    setIsMenuOpen(false);
-                  }}
-                >
-                  تسجيل دخول
-                </Button>
-                <Button
-                  className="w-full"
-                  onClick={() => {
-                    navigate('/auth');
-                    setIsMenuOpen(false);
-                  }}
-                >
-                  ابدأ الآن
-                </Button>
+          <div className="md:hidden py-4 border-t border-gray-200">
+            <div className="flex flex-col space-y-4">
+              <button
+                onClick={() => scrollToSection('features')}
+                className="text-left text-gray-600 hover:text-gray-900 font-medium py-2"
+              >
+                المميزات
+              </button>
+              <button
+                onClick={() => scrollToSection('how-it-works')}
+                className="text-left text-gray-600 hover:text-gray-900 font-medium py-2"
+              >
+                كيف يعمل
+              </button>
+              <button
+                onClick={() => scrollToSection('statistics')}
+                className="text-left text-gray-600 hover:text-gray-900 font-medium py-2"
+              >
+                الإحصائيات
+              </button>
+              <button
+                onClick={() => scrollToSection('about')}
+                className="text-left text-gray-600 hover:text-gray-900 font-medium py-2"
+              >
+                حول النظام
+              </button>
+              <div className="flex flex-col space-y-2 pt-4 border-t border-gray-200">
+                <Link to="/auth">
+                  <Button variant="outline" className="w-full">تسجيل الدخول</Button>
+                </Link>
+                <Link to="/auth?tab=signup">
+                  <Button className="w-full">ابدأ الآن</Button>
+                </Link>
               </div>
             </div>
           </div>
         )}
       </div>
-    </nav>
+
+      {/* Features Section */}
+      <section id="features" className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">مميزات النظام</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              نقدم لك أفضل التقنيات لمراقبة صحة القلب وضمان سلامتك على مدار الساعة
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {features.map((feature) => (
+              <div key={feature.id} className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                <div className={`inline-flex p-3 rounded-full bg-gray-100 mb-4`}>
+                  <feature.icon className={`w-6 h-6 ${feature.color}`} />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">{feature.title}</h3>
+                <p className="text-gray-600">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section id="how-it-works" className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">كيف يعمل النظام</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              خطوات بسيطة للبدء في مراقبة صحة قلبك بكفاءة عالية
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
+                <Smartphone className="w-8 h-8 text-blue-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">1. اربط جهازك</h3>
+              <p className="text-gray-600">قم بربط جهاز مراقبة القلب عبر البلوتوث أو أدخل القراءات يدوياً</p>
+            </div>
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
+                <BarChart3 className="w-8 h-8 text-green-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">2. راقب البيانات</h3>
+              <p className="text-gray-600">تابع قراءات القلب والضغط مع تحليلات ذكية ورسوم بيانية مفصلة</p>
+            </div>
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
+                <Shield className="w-8 h-8 text-red-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">3. احصل على التنبيهات</h3>
+              <p className="text-gray-600">تلقى إشعارات فورية عند اكتشاف أي مشاكل مع توصيات طبية</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Statistics Section */}
+      <section id="statistics" className="py-16 bg-blue-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">الإحصائيات</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              أرقام تُظهر جودة وموثوقية نظامنا في مراقبة صحة القلب
+            </p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {stats.map((stat, index) => (
+              <div key={index} className="text-center">
+                <div className="text-4xl font-bold text-blue-600 mb-2">{stat.number}</div>
+                <div className="text-gray-600">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section id="about" className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">حول النظام</h2>
+            <div className="max-w-3xl mx-auto">
+              <p className="text-gray-600 text-lg mb-6">
+                نظام مراقبة مرضى القلب هو منصة طبية متقدمة تهدف إلى توفير حلول شاملة لمراقبة صحة القلب والأوعية الدموية. 
+                يستخدم النظام أحدث التقنيات لضمان المراقبة المستمرة والدقيقة لحالة المرضى.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+                <div className="text-center">
+                  <FileText className="w-12 h-12 text-blue-600 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">سجلات طبية شاملة</h3>
+                  <p className="text-gray-600">احتفظ بسجل مفصل لجميع قراءاتك الطبية مع إمكانية المشاركة مع الأطباء</p>
+                </div>
+                <div className="text-center">
+                  <Users className="w-12 h-12 text-green-600 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">دعم متعدد الأدوار</h3>
+                  <p className="text-gray-600">يدعم النظام أدوار مختلفة: المرضى، الأطباء، وأفراد العائلة</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
   );
 };
 
