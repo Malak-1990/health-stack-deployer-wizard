@@ -1,310 +1,174 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Heart, Mail, Lock, ArrowRight, UserPlus, LogIn } from 'lucide-react';
+
+import React, { useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { useRole } from '@/contexts/RoleContext';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { useToast } from '@/hooks/use-toast';
-import RoleSelector from '@/components/RoleSelector';
-import AuthAnimations from '@/components/AuthAnimations';
 
-const Auth = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { signIn, signUp, loading } = useAuth();
-  const { userRole } = useRole();
-  const { direction } = useLanguage();
-  const { toast } = useToast();
+const AuthPage: React.FC = () => {
+    const [isLogin, setIsLogin] = useState(true);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [fullName, setFullName] = useState('');
+    const [selectedRole, setSelectedRole] = useState<'patient' | 'doctor' | 'family' | 'admin'>('patient');
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState('');
+    const navigate = useNavigate();
+    const { signIn, signUp } = useAuth();
 
-  const [activeTab, setActiveTab] = useState<'signin' | 'signup'>('signin');
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    confirmPassword: '',
-    fullName: '',
-  });
-  const [error, setError] = useState('');
+    const handleAuth = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setMessage('');
 
-  useEffect(() => {
-    // تحديد علامة التبويب بناءً على URL
-    const searchParams = new URLSearchParams(location.search);
-    const tab = searchParams.get('tab');
-    if (tab === 'signup') {
-      setActiveTab('signup');
-    }
-  }, [location]);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    if (error) setError('');
-  };
-
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.email || !formData.password) {
-      setError('يرجى ملء جميع الحقول المطلوبة');
-      return;
-    }
-
-    try {
-      await signIn(formData.email, formData.password);
-      toast({
-        title: 'تم تسجيل الدخول بنجاح',
-        description: 'مرحباً بك في نظام مراقبة مرضى القلب',
-      });
-      navigate('/dashboard');
-    } catch (error: any) {
-      setError(error.message || 'حدث خطأ أثناء تسجيل الدخول');
-    }
-  };
-
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.email || !formData.password || !formData.fullName) {
-      setError('يرجى ملء جميع الحقول المطلوبة');
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError('كلمات المرور غير متطابقة');
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      setError('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
-      return;
-    }
-
-    if (!userRole) {
-      setError('يرجى اختيار نوع المستخدم');
-      return;
-    }
-
-    try {
-      await signUp(formData.email, formData.password, formData.fullName);
-      
-      toast({
-        title: 'تم إنشاء الحساب بنجاح',
-        description: 'مرحباً بك في نظام مراقبة مرضى القلب',
-      });
-      navigate('/dashboard');
-    } catch (error: any) {
-      setError(error.message || 'حدث خطأ أثناء إنشاء الحساب');
-    }
-  };
-
-  return (
-    <div 
-      className={`min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4 ${
-        direction === 'rtl' ? 'font-cairo' : ''
-      }`} 
-      dir={direction}
-    >
-      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-        
-        {/* Left Side - Animations */}
-        <div className="hidden lg:block">
-          <div className="text-center mb-8">
-            <div className="flex items-center justify-center mb-4">
-              <div className="p-3 bg-red-100 rounded-full">
-                <Heart className="h-8 w-8 text-red-600" />
-              </div>
-            </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              نظام مراقبة مرضى القلب
-            </h1>
-            <p className="text-gray-600">
-              نظام متكامل للمراقبة الصحية الذكية
-            </p>
-          </div>
-          <AuthAnimations />
-        </div>
-
-        {/* Right Side - Auth Form */}
-        <div className="w-full max-w-md mx-auto lg:max-w-none">
-          <Card className="shadow-2xl border-0">
-            <CardHeader className="text-center space-y-2">
-              <div className="flex items-center justify-center lg:hidden mb-4">
-                <div className="p-3 bg-red-100 rounded-full">
-                  <Heart className="h-8 w-8 text-red-600" />
-                </div>
-              </div>
-              <CardTitle className="text-2xl font-bold">
-                {activeTab === 'signin' ? 'تسجيل الدخول' : 'إنشاء حساب جديد'}
-              </CardTitle>
-              <CardDescription>
-                {activeTab === 'signin' 
-                  ? 'ادخل إلى حسابك للوصول لوحة التحكم' 
-                  : 'أنشئ حساباً جديداً للبدء'
+        try {
+            if (isLogin) {
+                const { error } = await signIn(email, password);
+                if (error) throw error;
+                setMessage('تم تسجيل الدخول بنجاح. جاري التوجيه...');
+            } else {
+                const { error } = await signUp(email, password, fullName);
+                if (error) {
+                    throw error;
                 }
-              </CardDescription>
-            </CardHeader>
 
-            <CardContent>
-              <Tabs value={activeTab} onValueChange={(value: any) => setActiveTab(value)}>
-                <TabsList className="grid w-full grid-cols-2 mb-6">
-                  <TabsTrigger value="signin" className="flex items-center space-x-2">
-                    <LogIn className="h-4 w-4" />
-                    <span className="mr-2">تسجيل دخول</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="signup" className="flex items-center space-x-2">
-                    <UserPlus className="h-4 w-4" />
-                    <span className="mr-2">حساب جديد</span>
-                  </TabsTrigger>
-                </TabsList>
+                // Create user profile with selected role
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    const { error: profileError } = await supabase.from('profiles').upsert([
+                        {
+                            id: user.id,
+                            full_name: fullName,
+                            role: selectedRole,
+                        }
+                    ], { onConflict: 'id' });
 
-                {error && (
-                  <Alert variant="destructive" className="mb-4">
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
-                )}
+                    if (profileError) {
+                        console.error('Error creating user profile:', profileError.message);
+                        setMessage(`حدث خطأ أثناء إنشاء ملفك الشخصي: ${profileError.message}`);
+                        return;
+                    }
 
-                <TabsContent value="signin">
-                  <form onSubmit={handleSignIn} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="signin-email">البريد الإلكتروني</Label>
-                      <div className="relative">
-                        <Mail className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <Input
-                          id="signin-email"
-                          name="email"
-                          type="email"
-                          value={formData.email}
-                          onChange={handleInputChange}
-                          placeholder="your@email.com"
-                          className="pr-10"
-                          required
-                        />
-                      </div>
+                    setMessage('تم إنشاء الحساب بنجاح! جاري التوجيه...');
+                } else {
+                    setMessage('تحقق من بريدك الإلكتروني لتأكيد حسابك قبل تسجيل الدخول.');
+                }
+            }
+        } catch (error: any) {
+            setMessage(`خطأ: ${error.message}`);
+            console.error('Auth error:', error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-[#03045E] to-[#0077B6] flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl shadow-xl p-8 max-w-lg w-full text-center">
+                {/* Logo and University Header */}
+                <div className="flex items-center justify-center mb-6">
+                    <img 
+                        src="/lovable-uploads/1d5bbf79-3e01-4978-8149-e5c89b8136b2.png" 
+                        alt="University Logo" 
+                        className="w-12 h-12 mr-3"
+                    />
+                    <div className="text-right">
+                        <h1 className="text-lg font-bold text-[#03045E]">جامعة الإسكندرية</h1>
+                        <p className="text-sm text-gray-600">كلية الهندسة</p>
                     </div>
+                </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="signin-password">كلمة المرور</Label>
-                      <div className="relative">
-                        <Lock className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <Input
-                          id="signin-password"
-                          name="password"
-                          type="password"
-                          value={formData.password}
-                          onChange={handleInputChange}
-                          placeholder="••••••••"
-                          className="pr-10"
-                          required
+                <h2 className="text-3xl font-bold text-[#03045E] mb-6">
+                    {isLogin ? 'تسجيل الدخول' : 'إنشاء حساب جديد'}
+                </h2>
+
+                <form onSubmit={handleAuth} className="space-y-6">
+                    {!isLogin && (
+                        <input
+                            type="text"
+                            placeholder="الاسم الكامل"
+                            value={fullName}
+                            onChange={(e) => setFullName(e.target.value)}
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00B4D8] focus:border-transparent transition-all"
+                            required={!isLogin}
                         />
-                      </div>
-                    </div>
-
-                    <Button 
-                      type="submit" 
-                      className="w-full group"
-                      disabled={loading}
-                    >
-                      {loading ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}
-                      <ArrowRight className="mr-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                    </Button>
-                  </form>
-                </TabsContent>
-
-                <TabsContent value="signup">
-                  <form onSubmit={handleSignUp} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-name">الاسم الكامل</Label>
-                      <Input
-                        id="signup-name"
-                        name="fullName"
-                        type="text"
-                        value={formData.fullName}
-                        onChange={handleInputChange}
-                        placeholder="الاسم الكامل"
+                    )}
+                    <input
+                        type="email"
+                        placeholder="البريد الإلكتروني"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00B4D8] focus:border-transparent transition-all"
                         required
-                      />
-                    </div>
+                    />
+                    <input
+                        type="password"
+                        placeholder="كلمة المرور"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00B4D8] focus:border-transparent transition-all"
+                        required
+                    />
 
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-email">البريد الإلكتروني</Label>
-                      <div className="relative">
-                        <Mail className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <Input
-                          id="signup-email"
-                          name="email"
-                          type="email"
-                          value={formData.email}
-                          onChange={handleInputChange}
-                          placeholder="your@email.com"
-                          className="pr-10"
-                          required
-                        />
-                      </div>
-                    </div>
+                    {!isLogin && (
+                        <div>
+                            <h3 className="text-lg font-semibold text-gray-700 mb-3">اختر نوع المستخدم:</h3>
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                {['patient', 'doctor', 'family', 'admin'].map((roleOption) => (
+                                    <button
+                                        key={roleOption}
+                                        type="button"
+                                        onClick={() => setSelectedRole(roleOption as any)}
+                                        className={`p-4 rounded-lg border-2 transition-all duration-200 ${
+                                            selectedRole === roleOption
+                                                ? 'bg-[#00B4D8] border-[#0077B6] text-white shadow-md'
+                                                : 'bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200'
+                                        }`}
+                                    >
+                                        {roleOption === 'patient' && 'مريض'}
+                                        {roleOption === 'doctor' && 'طبيب'}
+                                        {roleOption === 'family' && 'فرد عائلة'}
+                                        {roleOption === 'admin' && 'مشرف'}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-password">كلمة المرور</Label>
-                      <div className="relative">
-                        <Lock className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <Input
-                          id="signup-password"
-                          name="password"
-                          type="password"
-                          value={formData.password}
-                          onChange={handleInputChange}
-                          placeholder="••••••••"
-                          className="pr-10"
-                          required
-                        />
-                      </div>
-                    </div>
+                    {message && (
+                        <p className={`mt-4 text-sm ${message.startsWith('خطأ') ? 'text-red-500' : 'text-green-500'}`}>
+                            {message}
+                        </p>
+                    )}
 
-                    <div className="space-y-2">
-                      <Label htmlFor="confirm-password">تأكيد كلمة المرور</Label>
-                      <div className="relative">
-                        <Lock className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <Input
-                          id="confirm-password"
-                          name="confirmPassword"
-                          type="password"
-                          value={formData.confirmPassword}
-                          onChange={handleInputChange}
-                          placeholder="••••••••"
-                          className="pr-10"
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>نوع المستخدم</Label>
-                      <RoleSelector />
-                    </div>
-
-                    <Button 
-                      type="submit" 
-                      className="w-full group"
-                      disabled={loading}
+                    <button
+                        type="submit"
+                        className="w-full bg-[#0077B6] text-white font-bold py-3 rounded-lg hover:bg-opacity-90 transition-colors duration-300 shadow-md disabled:opacity-50"
+                        disabled={loading}
                     >
-                      {loading ? 'جاري إنشاء الحساب...' : 'إنشاء حساب'}
-                      <ArrowRight className="mr-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                    </Button>
-                  </form>
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
+                        {loading ? 'جاري التحميل...' : (isLogin ? 'تسجيل الدخول' : 'إنشاء حساب')}
+                    </button>
+                </form>
+
+                <p className="mt-6 text-gray-600">
+                    {isLogin ? 'ليس لديك حساب؟ ' : 'لديك حساب بالفعل؟ '}
+                    <button
+                        onClick={() => {
+                            setIsLogin(!isLogin);
+                            setMessage('');
+                            setLoading(false);
+                            setEmail('');
+                            setPassword('');
+                            setFullName('');
+                            setSelectedRole('patient');
+                        }}
+                        className="text-[#0077B6] font-semibold hover:underline"
+                    >
+                        {isLogin ? 'إنشاء حساب جديد' : 'تسجيل الدخول'}
+                    </button>
+                </p>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
-export default Auth;
+export default AuthPage;
