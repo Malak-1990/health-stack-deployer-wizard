@@ -219,7 +219,7 @@ class BluetoothService {
     return this.device?.gatt?.connected || false;
   }
 
-  isConnecting(): boolean {
+  getIsConnecting(): boolean {
     return this.isConnecting;
   }
 

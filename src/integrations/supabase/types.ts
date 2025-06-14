@@ -189,6 +189,27 @@ export type Database = {
         }
         Relationships: []
       }
+      otp_table: {
+        Row: {
+          expires_at: string
+          id: string
+          otp_code: string
+          user_id: string
+        }
+        Insert: {
+          expires_at: string
+          id?: string
+          otp_code: string
+          user_id: string
+        }
+        Update: {
+          expires_at?: string
+          id?: string
+          otp_code?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -278,7 +299,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_otp: {
+        Args: { p_user_id: string } | { user_id: number }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
