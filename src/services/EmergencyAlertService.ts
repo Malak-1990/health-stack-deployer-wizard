@@ -67,7 +67,7 @@ class EmergencyAlertService {
               latitude: alert.location.latitude,
               longitude: alert.location.longitude,
               accuracy: alert.location.accuracy,
-              timestamp: alert.location.timestamp
+              timestamp: alert.location.timestamp.toISOString()
             },
             heart_rate: alert.heartRate,
             timestamp: alert.timestamp.toISOString(),
