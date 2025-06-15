@@ -40,6 +40,9 @@ const LandingNav: React.FC<LandingNavProps> = ({ logoUrl }) => {
           <a href="#about" className="text-[#CAF0F8] text-sm font-semibold px-3 py-2 rounded-lg hover:bg-[#0077B6] transition-colors duration-300">
             حول النظام
           </a>
+          <Link to="/contact" className="text-[#CAF0F8] text-sm font-semibold px-3 py-2 rounded-lg hover:bg-[#90e0ef] border border-[#00B4D8] transition-colors duration-300">
+            الدعم الفني
+          </Link>
           <Link to="/auth" className="bg-[#00B4D8] text-[#03045E] text-sm font-semibold px-3 py-2 rounded-lg hover:bg-opacity-90 transition-colors duration-300">
             تسجيل الدخول
           </Link>
