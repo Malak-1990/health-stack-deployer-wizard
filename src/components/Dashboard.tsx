@@ -97,6 +97,7 @@ const Dashboard = () => {
               break;
           }
           
+          console.log('Setting role to:', frontendRole, 'Redirecting to:', targetPath);
           setUserRole(frontendRole);
           setRedirectPath(targetPath);
           
@@ -121,10 +122,11 @@ const Dashboard = () => {
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">جاري التحميل...</p>
           {user && (
-            <div className="mt-4 text-sm text-gray-500">
+            <div className="mt-4 text-sm text-gray-500 space-y-1">
               <p>البريد الإلكتروني: {user.email}</p>
               <p>معرف المستخدم: {user.id}</p>
               <p>الدور من قاعدة البيانات: {userDbRole || 'جاري التحميل...'}</p>
+              <p>نوع المستخدم: {userRole}</p>
             </div>
           )}
         </div>

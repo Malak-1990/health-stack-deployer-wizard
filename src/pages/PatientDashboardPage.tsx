@@ -2,12 +2,14 @@
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/hooks/useAuth';
-import { Heart, Settings, Menu } from 'lucide-react';
+import { useRole } from '@/contexts/RoleContext';
+import { Heart, Settings, Menu, LogOut, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import PatientDashboard from '@/components/PatientDashboard';
 
 const PatientDashboardPage = () => {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
+  const { userRole } = useRole();
   const { direction } = useLanguage();
 
   return (
@@ -18,13 +20,14 @@ const PatientDashboardPage = () => {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-red-100 rounded-lg">
-                <Heart className="h-6 w-6 text-red-600" />
+                <User className="h-6 w-6 text-red-600" />
               </div>
               <div className={direction === 'rtl' ? 'mr-3' : 'ml-3'}>
                 <h1 className="text-xl font-semibold text-gray-900">
                   لوحة تحكم المريض
                 </h1>
-                <p className="text-sm text-gray-600">مرحباً، {user?.email}</p>
+                <p className="text-sm text-gray-600">مرحباً، {user?.user_metadata?.full_name || user?.email}</p>
+                <p className="text-xs text-red-600">نوع الحساب: {userRole === 'patient' ? 'مريض' : userRole}</p>
               </div>
             </div>
             
@@ -35,6 +38,10 @@ const PatientDashboardPage = () => {
                   الإعدادات
                 </Button>
               </Link>
+              <Button variant="outline" size="sm" onClick={signOut}>
+                <LogOut className="h-4 w-4 mr-2" />
+                تسجيل الخروج
+              </Button>
             </div>
           </div>
         </div>
@@ -47,4 +54,4 @@ const PatientDashboardPage = () => {
   );
 };
 
-export default PatientDashboardPage;
+export default PatientDashboard;
