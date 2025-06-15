@@ -3,14 +3,17 @@ import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/hooks/useAuth';
 import { useRole } from '@/contexts/RoleContext';
-import { Heart, Settings, Menu, LogOut, User } from 'lucide-react';
+import { usePWAInstall } from '@/hooks/usePWAInstall';
+import { Heart, Settings, Menu, LogOut, User, Download } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import PatientDashboard from '@/components/PatientDashboard';
+import LogoutButton from '@/components/LogoutButton';
 
 const PatientDashboardPage = () => {
   const { user, signOut } = useAuth();
   const { userRole } = useRole();
   const { direction } = useLanguage();
+  const { showInstallButton, handleInstallClick } = usePWAInstall();
 
   return (
     <div className={`min-h-screen bg-gray-50 ${direction === 'rtl' ? 'font-cairo' : ''}`} dir={direction}>
@@ -32,16 +35,23 @@ const PatientDashboardPage = () => {
             </div>
             
             <div className="flex items-center space-x-4">
+              {/* PWA Install Button */}
+              {showInstallButton && (
+                <Button variant="outline" size="sm" onClick={handleInstallClick}>
+                  <Download className="h-4 w-4 mr-2" />
+                  تحميل التطبيق
+                </Button>
+              )}
+              
               <Link to="/settings">
                 <Button variant="outline" size="sm">
                   <Settings className="h-4 w-4 mr-2" />
                   الإعدادات
                 </Button>
               </Link>
-              <Button variant="outline" size="sm" onClick={signOut}>
-                <LogOut className="h-4 w-4 mr-2" />
-                تسجيل الخروج
-              </Button>
+              
+              {/* Logout Button */}
+              <LogoutButton variant="outline" size="sm" />
             </div>
           </div>
         </div>
@@ -54,4 +64,4 @@ const PatientDashboardPage = () => {
   );
 };
 
-export default PatientDashboard;
+export default PatientDashboardPage;

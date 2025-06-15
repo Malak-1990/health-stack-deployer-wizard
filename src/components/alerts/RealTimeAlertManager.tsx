@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { smartAlertService, SmartAlert } from '@/services/SmartAlertService';
 import { emergencyAlertService } from '@/services/EmergencyAlertService';
 import { useToast } from '@/hooks/use-toast';
-import { AlertTriangle, Volume2 } from 'lucide-react';
+import { AlertTriangle, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -34,8 +34,13 @@ const RealTimeAlertManager = () => {
 
   const loadCriticalAlerts = async () => {
     if (!user) return;
-    const alerts = await smartAlertService.getCriticalAlerts(user.id);
-    setCriticalAlerts(alerts);
+    try {
+      const alerts = await smartAlertService.getCriticalAlerts(user.id);
+      setCriticalAlerts(alerts);
+    } catch (error) {
+      console.error('Error loading critical alerts:', error);
+      setCriticalAlerts([]);
+    }
   };
 
   const handleNewAlert = (alert: SmartAlert) => {
@@ -75,6 +80,8 @@ const RealTimeAlertManager = () => {
   };
 
   const playAlertSound = async () => {
+    if (!isAudioEnabled) return;
+    
     try {
       // إنشاء سياق صوتي
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -145,7 +152,7 @@ const RealTimeAlertManager = () => {
           onClick={toggleAudio}
           className={`${isAudioEnabled ? 'text-green-600' : 'text-gray-400'}`}
         >
-          <Volume2 className="h-4 w-4" />
+          {isAudioEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
         </Button>
       </div>
     );
@@ -161,7 +168,7 @@ const RealTimeAlertManager = () => {
           onClick={toggleAudio}
           className={`${isAudioEnabled ? 'text-green-600' : 'text-gray-400'}`}
         >
-          <Volume2 className="h-4 w-4" />
+          {isAudioEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
         </Button>
       </div>
 

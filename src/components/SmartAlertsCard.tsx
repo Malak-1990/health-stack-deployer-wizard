@@ -1,11 +1,10 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { smartAlertService, SmartAlert } from '@/services/SmartAlertService';
-import { AlertTriangle, CheckCircle, Clock, XCircle, Bell, Heart, Activity, TrendingUp, TrendingDown } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Clock, XCircle, Bell, Heart, Activity, TrendingUp, TrendingDown, Volume2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const SmartAlertsCard = () => {
@@ -14,6 +13,7 @@ const SmartAlertsCard = () => {
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
   const [criticalCount, setCriticalCount] = useState(0);
+  const [soundEnabled, setSoundEnabled] = useState(true);
 
   useEffect(() => {
     if (user) {
@@ -27,9 +27,13 @@ const SmartAlertsCard = () => {
         
         if (newAlert.severity === 'critical') {
           setCriticalCount(prev => prev + 1);
-          playUrgentAlertSound();
+          if (soundEnabled) {
+            playUrgentAlertSound();
+          }
         } else if (newAlert.severity === 'high') {
-          playAlertSound();
+          if (soundEnabled) {
+            playAlertSound();
+          }
         }
       });
 
@@ -39,31 +43,43 @@ const SmartAlertsCard = () => {
         }
       };
     }
-  }, [user]);
+  }, [user, soundEnabled]);
 
   const loadAlerts = async () => {
     if (!user) return;
     
     setLoading(true);
-    const userAlerts = await smartAlertService.getUserAlerts(user.id);
-    setAlerts(userAlerts);
-    
-    // Count critical alerts
-    const critical = userAlerts.filter(alert => 
-      alert.severity === 'critical' && !alert.resolved_at
-    ).length;
-    setCriticalCount(critical);
+    try {
+      const userAlerts = await smartAlertService.getUserAlerts(user.id);
+      setAlerts(userAlerts);
+      
+      // Count critical alerts
+      const critical = userAlerts.filter(alert => 
+        alert.severity === 'critical' && !alert.resolved_at
+      ).length;
+      setCriticalCount(critical);
+    } catch (error) {
+      console.error('Error loading alerts:', error);
+      setAlerts([]); // Set empty array if error
+    }
     
     setLoading(false);
   };
 
   const loadUnreadCount = async () => {
     if (!user) return;
-    const count = await smartAlertService.getUnreadAlertsCount(user.id);
-    setUnreadCount(count);
+    try {
+      const count = await smartAlertService.getUnreadAlertsCount(user.id);
+      setUnreadCount(count);
+    } catch (error) {
+      console.error('Error loading unread count:', error);
+      setUnreadCount(0); // Set to 0 if error
+    }
   };
 
   const playAlertSound = () => {
+    if (!soundEnabled) return;
+    
     try {
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
       const oscillator = audioContext.createOscillator();
@@ -86,6 +102,8 @@ const SmartAlertsCard = () => {
   };
 
   const playUrgentAlertSound = () => {
+    if (!soundEnabled) return;
+    
     try {
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
       
@@ -109,6 +127,10 @@ const SmartAlertsCard = () => {
     } catch (error) {
       console.error('Error playing urgent alert sound:', error);
     }
+  };
+
+  const toggleSound = () => {
+    setSoundEnabled(!soundEnabled);
   };
 
   const handleMarkAsRead = async (alertId: string) => {
@@ -211,7 +233,17 @@ const SmartAlertsCard = () => {
               </div>
             )}
           </div>
-          <div className="flex space-x-2">
+          <div className="flex items-center space-x-2">
+            {/* Sound Toggle Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleSound}
+              className={`${soundEnabled ? 'text-green-600' : 'text-gray-400'}`}
+            >
+              <Volume2 className="h-4 w-4" />
+            </Button>
+            
             {criticalCount > 0 && (
               <Badge variant="destructive" className="animate-pulse font-bold">
                 {criticalCount} حرج
