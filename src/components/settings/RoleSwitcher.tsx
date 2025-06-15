@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useRole, UserRole } from '@/contexts/RoleContext';
 import { useAuth } from '@/hooks/useAuth';
@@ -7,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { UserCheck, AlertTriangle } from 'lucide-react';
+import { UserCheck, AlertTriangle, RefreshCw } from 'lucide-react';
 
 const RoleSwitcher = () => {
   const { userRole, setUserRole } = useRole();
@@ -15,6 +16,7 @@ const RoleSwitcher = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedRole, setSelectedRole] = useState<UserRole>(userRole);
+  const [dbRole, setDbRole] = useState<string | null>(null);
 
   const roleLabels = {
     patient: 'مريض',
@@ -39,6 +41,28 @@ const RoleSwitcher = () => {
     }
   };
 
+  const fetchCurrentDbRole = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching role:', error);
+        setDbRole('خطأ في الحصول على الدور');
+      } else {
+        setDbRole(data?.role || 'غير محدد');
+      }
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      setDbRole('خطأ غير متوقع');
+    }
+  };
+
   const handleRoleChange = async () => {
     if (!user || selectedRole === userRole) return;
 
@@ -46,15 +70,15 @@ const RoleSwitcher = () => {
     try {
       console.log('Attempting to update role for user:', user.id, 'to:', selectedRole);
       
-      const dbRole = mapToDbRole(selectedRole);
-      console.log('Mapped database role:', dbRole);
+      const dbRoleValue = mapToDbRole(selectedRole);
+      console.log('Mapped database role:', dbRoleValue);
 
       // Use upsert to handle both insert and update cases
       const { error } = await supabase
         .from('profiles')
         .upsert({
           id: user.id,
-          role: dbRole,
+          role: dbRoleValue,
           full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'مستخدم',
           updated_at: new Date().toISOString()
         }, {
@@ -73,6 +97,7 @@ const RoleSwitcher = () => {
 
       // Update local role state
       setUserRole(selectedRole);
+      setDbRole(dbRoleValue);
       
       toast({
         title: "تم التحديث بنجاح",
@@ -102,6 +127,11 @@ const RoleSwitcher = () => {
     }
   };
 
+  // Fetch current DB role on component mount
+  React.useEffect(() => {
+    fetchCurrentDbRole();
+  }, [user]);
+
   return (
     <Card className="border-orange-200">
       <CardHeader>
@@ -111,12 +141,12 @@ const RoleSwitcher = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="bg-orange-50 p-4 rounded-lg">
-          <p className="text-sm text-orange-800 mb-2">
-            <strong>تحذير:</strong> هذه الخاصية مؤقتة لحل مشكلة الأدوار
+        <div className="bg-green-50 p-4 rounded-lg">
+          <p className="text-sm text-green-800 mb-2">
+            <strong>✅ تم الإصلاح:</strong> مشكلة إنشاء المستخدمين الجدد
           </p>
-          <p className="text-xs text-orange-600">
-            سيتم إزالة هذه الخاصية بعد إصلاح المشكلة الأساسية
+          <p className="text-xs text-green-600">
+            الآن يمكن إنشاء حسابات جديدة بدون أخطاء في قاعدة البيانات
           </p>
         </div>
 
@@ -151,6 +181,16 @@ const RoleSwitcher = () => {
             <UserCheck className="h-4 w-4 mr-2" />
             {isLoading ? 'جاري التحديث...' : 'تطبيق التغيير'}
           </Button>
+
+          <Button 
+            onClick={fetchCurrentDbRole}
+            variant="outline"
+            size="sm"
+            className="w-full"
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            تحديث معلومات قاعدة البيانات
+          </Button>
         </div>
 
         {user?.email === 'malaksalama21@gmail.com' && (
@@ -166,7 +206,8 @@ const RoleSwitcher = () => {
             <strong>معلومات التشخيص:</strong><br/>
             معرف المستخدم: {user?.id}<br/>
             البريد الإلكتروني: {user?.email}<br/>
-            النوع المحدد: {selectedRole}
+            النوع المحدد: {selectedRole}<br/>
+            الدور في قاعدة البيانات: {dbRole || 'جاري التحميل...'}
           </p>
         </div>
       </CardContent>
