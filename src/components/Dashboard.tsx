@@ -10,6 +10,7 @@ const Dashboard = () => {
   const { user, loading } = useAuth();
   const [userDbRole, setUserDbRole] = useState<string | null>(null);
   const [checkingRole, setCheckingRole] = useState(true);
+  const [redirectPath, setRedirectPath] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUserRole = async () => {
@@ -25,6 +26,8 @@ const Dashboard = () => {
 
           console.log('Profile data:', profile);
           console.log('Profile error:', error);
+
+          let finalRole = 'user';
 
           if (error) {
             console.error('Error fetching user role:', error);
@@ -42,36 +45,12 @@ const Dashboard = () => {
                 ]);
               
               if (!insertError) {
-                setUserDbRole('admin');
-                setUserRole('admin');
-              } else {
-                console.error('Error creating admin profile:', insertError);
-                setUserDbRole('user');
-                setUserRole('patient');
+                finalRole = 'admin';
               }
-            } else {
-              setUserDbRole('user');
-              setUserRole('patient');
             }
           } else if (profile && profile.role) {
             console.log('Found user role in database:', profile.role);
-            setUserDbRole(profile.role);
-            // Map database roles to frontend roles
-            switch (profile.role) {
-              case 'admin':
-                setUserRole('admin');
-                break;
-              case 'doctor':
-                setUserRole('doctor');
-                break;
-              case 'family':
-                setUserRole('family');
-                break;
-              case 'user':
-              default:
-                setUserRole('patient');
-                break;
-            }
+            finalRole = profile.role;
           } else {
             // If no role found, but this is your email, make admin
             if (user.email === 'malaksalama21@gmail.com') {
@@ -87,22 +66,45 @@ const Dashboard = () => {
                 ]);
               
               if (!updateError) {
-                setUserDbRole('admin');
-                setUserRole('admin');
-              } else {
-                console.error('Error updating to admin:', updateError);
-                setUserDbRole('user');
-                setUserRole('patient');
+                finalRole = 'admin';
               }
-            } else {
-              setUserDbRole('user');
-              setUserRole('patient');
             }
           }
+
+          setUserDbRole(finalRole);
+          
+          // Map database roles to frontend roles and set redirect path
+          let frontendRole: 'patient' | 'doctor' | 'family' | 'admin' = 'patient';
+          let targetPath = '/patient-dashboard';
+          
+          switch (finalRole) {
+            case 'admin':
+              frontendRole = 'admin';
+              targetPath = '/admin-dashboard';
+              break;
+            case 'doctor':
+              frontendRole = 'doctor';
+              targetPath = '/doctor-dashboard';
+              break;
+            case 'family':
+              frontendRole = 'family';
+              targetPath = '/family-dashboard';
+              break;
+            case 'user':
+            default:
+              frontendRole = 'patient';
+              targetPath = '/patient-dashboard';
+              break;
+          }
+          
+          setUserRole(frontendRole);
+          setRedirectPath(targetPath);
+          
         } catch (error) {
           console.error('Unexpected error:', error);
           setUserDbRole('user');
           setUserRole('patient');
+          setRedirectPath('/patient-dashboard');
         }
       }
       setCheckingRole(false);
@@ -135,23 +137,14 @@ const Dashboard = () => {
     return <Navigate to="/auth" replace />;
   }
 
-  // Route based on user role from database
-  const roleToRoute = userDbRole || userRole;
-  
-  console.log('Redirecting user with role:', roleToRoute, 'Email:', user.email);
-  
-  switch (roleToRoute) {
-    case 'admin':
-      return <Navigate to="/admin-dashboard" replace />;
-    case 'doctor':
-      return <Navigate to="/doctor-dashboard" replace />;
-    case 'family':
-      return <Navigate to="/family-dashboard" replace />;
-    case 'patient':
-    case 'user':
-    default:
-      return <Navigate to="/patient-dashboard" replace />;
+  // If we have a redirect path, use it
+  if (redirectPath) {
+    console.log('Redirecting user with role:', userDbRole, 'to:', redirectPath, 'Email:', user.email);
+    return <Navigate to={redirectPath} replace />;
   }
+
+  // Fallback to patient dashboard
+  return <Navigate to="/patient-dashboard" replace />;
 };
 
 export default Dashboard;

@@ -39,8 +39,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setHasRedirected(true);
           // Use setTimeout to avoid blocking the auth state update
           setTimeout(() => {
-            if (mounted && window.location.pathname === '/auth') {
-              window.location.href = '/dashboard';
+            if (mounted) {
+              // Only redirect if we're on the auth page
+              const currentPath = window.location.pathname;
+              if (currentPath === '/auth' || currentPath === '/') {
+                window.location.href = '/dashboard';
+              }
             }
           }, 100);
         }
