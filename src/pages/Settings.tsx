@@ -2,11 +2,14 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import AdvancedSettings from '@/components/settings/AdvancedSettings';
 import LogoutButton from '@/components/LogoutButton';
-import { Settings as SettingsIcon, User } from 'lucide-react';
+import { Settings as SettingsIcon, User, ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
 const Settings = () => {
   const { direction } = useLanguage();
+  const navigate = useNavigate();
 
   return (
     <div className={`min-h-screen p-6 ${direction === 'rtl' ? 'font-cairo' : ''}`} dir={direction}>
@@ -14,6 +17,9 @@ const Settings = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="text-gray-600 hover:text-gray-900">
+              <ArrowLeft className="h-6 w-6" />
+            </Button>
             <SettingsIcon className="h-8 w-8 text-blue-600" />
             <div>
               <h1 className="text-3xl font-bold text-gray-900">الإعدادات</h1>

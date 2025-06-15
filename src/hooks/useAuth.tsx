@@ -2,6 +2,7 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { useRole, UserRole } from '@/contexts/RoleContext';
 
 interface AuthContextType {
   user: User | null;
@@ -19,28 +20,73 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [hasRedirected, setHasRedirected] = useState(false);
+  const { setUserRole } = useRole();
+
+  const fetchAndSetUserRole = async (user: User) => {
+    try {
+      const isAdminEmail = user.email === 'malaksalama21@gmail.com';
+      if (isAdminEmail) {
+        setUserRole('admin');
+        return;
+      }
+
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+      if (error) {
+        console.error('Error fetching user role, defaulting to patient:', error.message);
+        setUserRole('patient');
+        return;
+      }
+
+      const dbRole = profile?.role;
+      let finalRole: UserRole = 'patient';
+
+      switch (dbRole) {
+        case 'admin':
+        case 'doctor':
+        case 'family':
+          finalRole = dbRole;
+          break;
+        case 'user':
+        default:
+          finalRole = 'patient';
+          break;
+      }
+      setUserRole(finalRole);
+    } catch (error) {
+      console.error('Unexpected error fetching role:', error);
+      setUserRole('patient');
+    }
+  };
 
   useEffect(() => {
     let mounted = true;
+    setLoading(true);
 
-    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (!mounted) return;
 
         console.log('Auth state change:', event, session?.user?.email);
+        const currentUser = session?.user ?? null;
         setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
+        setUser(currentUser);
 
-        // Handle redirect only once and avoid loops
+        const rolePromise = currentUser ? fetchAndSetUserRole(currentUser) : Promise.resolve(setUserRole(null));
+        
+        rolePromise.finally(() => {
+            if (mounted) setLoading(false);
+        });
+
         if (event === 'SIGNED_IN' && session?.user && !hasRedirected) {
           console.log('User signed in, redirecting to dashboard...');
           setHasRedirected(true);
-          // Use setTimeout to avoid blocking the auth state update
           setTimeout(() => {
             if (mounted) {
-              // Only redirect if we're on the auth page
               const currentPath = window.location.pathname;
               if (currentPath === '/auth' || currentPath === '/') {
                 window.location.href = '/dashboard';
@@ -55,35 +101,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     );
 
-    // Check for existing session
-    const checkSession = async () => {
-      try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        if (error) {
-          console.error('Session check error:', error);
-        } else {
-          console.log('Existing session check:', session?.user?.email);
-          if (mounted) {
-            setSession(session);
-            setUser(session?.user ?? null);
-            setLoading(false);
-          }
-        }
-      } catch (error) {
-        console.error('Session check failed:', error);
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    };
+    supabase.auth.getSession().then(({ data: { session } }) => {
+        if (!mounted) return;
+        const currentUser = session?.user ?? null;
+        setSession(session);
+        setUser(currentUser);
+        const rolePromise = currentUser ? fetchAndSetUserRole(currentUser) : Promise.resolve(setUserRole(null));
+        rolePromise.finally(() => {
+            if (mounted) setLoading(false);
+        });
+    });
 
-    checkSession();
 
     return () => {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [setUserRole]);
 
   const signUp = async (email: string, password: string, fullName: string) => {
     setLoading(true);

@@ -4,8 +4,8 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 export type UserRole = 'patient' | 'doctor' | 'family' | 'admin';
 
 interface RoleContextType {
-  userRole: UserRole;
-  setUserRole: (role: UserRole) => void;
+  userRole: UserRole | null;
+  setUserRole: (role: UserRole | null) => void;
   permissions: {
     canViewAllPatients: boolean;
     canEditPatients: boolean;
@@ -19,9 +19,19 @@ interface RoleContextType {
 const RoleContext = createContext<RoleContextType | undefined>(undefined);
 
 export const RoleProvider = ({ children }: { children: ReactNode }) => {
-  const [userRole, setUserRole] = useState<UserRole>('patient');
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
 
-  const getPermissions = (role: UserRole) => {
+  const getPermissions = (role: UserRole | null) => {
+    if (!role) {
+      return {
+        canViewAllPatients: false,
+        canEditPatients: false,
+        canViewMedicalRecords: false,
+        canCreateAppointments: false,
+        canManageEmergencyContacts: false,
+        canAccessAdminDashboard: false,
+      };
+    }
     switch (role) {
       case 'admin':
         return {
