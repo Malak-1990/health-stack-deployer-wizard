@@ -50,51 +50,23 @@ const RoleSwitcher = () => {
       const dbRole = mapToDbRole(selectedRole);
       console.log('Mapped database role:', dbRole);
 
-      // First, check if profile exists
-      const { data: existingProfile, error: fetchError } = await supabase
+      // Use upsert to handle both insert and update cases
+      const { error } = await supabase
         .from('profiles')
-        .select('id, role, full_name')
-        .eq('id', user.id)
-        .maybeSingle();
+        .upsert({
+          id: user.id,
+          role: dbRole,
+          full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'مستخدم',
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'id'
+        });
 
-      console.log('Existing profile:', existingProfile);
-      console.log('Fetch error:', fetchError);
-
-      let updateError;
-
-      if (existingProfile) {
-        // Update existing profile
-        const { error } = await supabase
-          .from('profiles')
-          .update({ 
-            role: dbRole,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', user.id);
-        
-        updateError = error;
-        console.log('Update existing profile error:', error);
-      } else {
-        // Create new profile
-        const { error } = await supabase
-          .from('profiles')
-          .insert({
-            id: user.id,
-            role: dbRole,
-            full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'مستخدم',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          });
-        
-        updateError = error;
-        console.log('Insert new profile error:', error);
-      }
-
-      if (updateError) {
-        console.error('Database update error:', updateError);
+      if (error) {
+        console.error('Database upsert error:', error);
         toast({
           title: "خطأ في قاعدة البيانات",
-          description: `فشل في تحديث الملف الشخصي: ${updateError.message}`,
+          description: `فشل في تحديث الملف الشخصي: ${error.message}`,
           variant: "destructive",
         });
         return;
