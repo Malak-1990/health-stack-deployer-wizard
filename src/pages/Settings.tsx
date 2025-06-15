@@ -1,10 +1,9 @@
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLanguage } from '@/contexts/LanguageContext';
 import AdvancedSettings from '@/components/settings/AdvancedSettings';
 import RoleSwitcher from '@/components/settings/RoleSwitcher';
 import LogoutButton from '@/components/LogoutButton';
-import { Settings as SettingsIcon, User, Bell, Shield, Palette, Heart } from 'lucide-react';
+import { Settings as SettingsIcon, User } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const Settings = () => {
@@ -24,9 +23,6 @@ const Settings = () => {
           </div>
           <LogoutButton variant="destructive" />
         </div>
-
-        {/* Role Switcher - Temporary */}
-        <RoleSwitcher />
 
         {/* Account Settings Card */}
         <Card>
