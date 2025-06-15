@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
@@ -47,9 +48,10 @@ const AuthPage: React.FC = () => {
                         return;
                     }
 
-                    setMessage('تم إنشاء الحساب بنجاح! جاري التوجيه...');
+                    setMessage('تم إنشاء الحساب! يمكنك تسجيل الدخول فورًا بدون الحاجة إلى تأكيد البريد.');
                 } else {
-                    setMessage('تحقق من بريدك الإلكتروني لتأكيد حسابك قبل تسجيل الدخول.');
+                    // تحديث الرسالة:  
+                    setMessage('تم إنشاء الحساب! يمكنك الآن تسجيل الدخول مباشرة دون انتظار رسالة على البريد الإلكتروني.');
                 }
             }
         } catch (error: any) {
