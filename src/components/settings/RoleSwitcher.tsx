@@ -24,25 +24,77 @@ const RoleSwitcher = () => {
     admin: 'مدير'
   };
 
+  // Map frontend roles to database roles
+  const mapToDbRole = (frontendRole: UserRole): string => {
+    switch (frontendRole) {
+      case 'patient':
+        return 'user';
+      case 'doctor':
+        return 'doctor';
+      case 'family':
+        return 'family';
+      case 'admin':
+        return 'admin';
+      default:
+        return 'user';
+    }
+  };
+
   const handleRoleChange = async () => {
     if (!user || selectedRole === userRole) return;
 
     setIsLoading(true);
     try {
-      // Update role in database
-      const { error } = await supabase
-        .from('profiles')
-        .upsert({
-          id: user.id,
-          role: selectedRole === 'patient' ? 'user' : selectedRole,
-          full_name: user.user_metadata?.full_name || user.email
-        });
+      console.log('Attempting to update role for user:', user.id, 'to:', selectedRole);
+      
+      const dbRole = mapToDbRole(selectedRole);
+      console.log('Mapped database role:', dbRole);
 
-      if (error) {
-        console.error('Error updating role:', error);
+      // First, check if profile exists
+      const { data: existingProfile, error: fetchError } = await supabase
+        .from('profiles')
+        .select('id, role, full_name')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      console.log('Existing profile:', existingProfile);
+      console.log('Fetch error:', fetchError);
+
+      let updateError;
+
+      if (existingProfile) {
+        // Update existing profile
+        const { error } = await supabase
+          .from('profiles')
+          .update({ 
+            role: dbRole,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', user.id);
+        
+        updateError = error;
+        console.log('Update existing profile error:', error);
+      } else {
+        // Create new profile
+        const { error } = await supabase
+          .from('profiles')
+          .insert({
+            id: user.id,
+            role: dbRole,
+            full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'مستخدم',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          });
+        
+        updateError = error;
+        console.log('Insert new profile error:', error);
+      }
+
+      if (updateError) {
+        console.error('Database update error:', updateError);
         toast({
-          title: "خطأ",
-          description: "فشل في تحديث نوع المستخدم",
+          title: "خطأ في قاعدة البيانات",
+          description: `فشل في تحديث الملف الشخصي: ${updateError.message}`,
           variant: "destructive",
         });
         return;
@@ -52,7 +104,7 @@ const RoleSwitcher = () => {
       setUserRole(selectedRole);
       
       toast({
-        title: "تم التحديث",
+        title: "تم التحديث بنجاح",
         description: `تم تغيير نوع المستخدم إلى ${roleLabels[selectedRole]}`,
       });
 
@@ -62,14 +114,16 @@ const RoleSwitcher = () => {
                           selectedRole === 'doctor' ? '/doctor-dashboard' :
                           selectedRole === 'family' ? '/family-dashboard' :
                           '/patient-dashboard';
+        
+        console.log('Redirecting to:', targetPath);
         window.location.href = targetPath;
       }, 1500);
 
     } catch (error) {
-      console.error('Unexpected error:', error);
+      console.error('Unexpected error during role update:', error);
       toast({
-        title: "خطأ",
-        description: "حدث خطأ غير متوقع",
+        title: "خطأ غير متوقع",
+        description: "حدث خطأ غير متوقع أثناء تحديث نوع المستخدم",
         variant: "destructive",
       });
     } finally {
@@ -135,6 +189,15 @@ const RoleSwitcher = () => {
             </p>
           </div>
         )}
+
+        <div className="bg-gray-50 p-3 rounded-lg">
+          <p className="text-xs text-gray-600">
+            <strong>معلومات التشخيص:</strong><br/>
+            معرف المستخدم: {user?.id}<br/>
+            البريد الإلكتروني: {user?.email}<br/>
+            النوع المحدد: {selectedRole}
+          </p>
+        </div>
       </CardContent>
     </Card>
   );
