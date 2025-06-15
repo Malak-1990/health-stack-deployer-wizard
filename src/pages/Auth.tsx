@@ -13,7 +13,7 @@ const AuthPage: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
     const navigate = useNavigate();
-    const { signIn, signUp } = useAuth();
+    const { signIn } = useAuth();
 
     const handleAuth = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -22,41 +22,53 @@ const AuthPage: React.FC = () => {
 
         try {
             if (isLogin) {
+                // تسجيل الدخول الاعتيادي
                 const { error } = await signIn(email, password);
                 if (error) throw error;
                 setMessage('تم تسجيل الدخول بنجاح. جاري التوجيه...');
             } else {
-                const { error } = await signUp(email, password, fullName);
+                // تسجيل حساب جديد بدون تأكيد إيميل:
+                // استخدم تسجيل المستخدم، ثم تسجيل دخوله فورًا
+                const { data, error } = await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        emailRedirectTo: null,
+                        data: { full_name: fullName }
+                    }
+                });
+
                 if (error) {
                     throw error;
                 }
 
-                // Create user profile with selected role
+                // تسجيل الدخول الفوري
+                const { error: signInErr } = await signIn(email, password);
+                if (signInErr) throw signInErr;
+
+                // إنشاء البروفايل في جدول profiles (مع تحديد الدور مباشرة!)
                 const { data: { user } } = await supabase.auth.getUser();
                 if (user) {
-                    const { error: profileError } = await supabase.from('profiles').upsert([
-                        {
-                            id: user.id,
-                            full_name: fullName,
-                            role: selectedRole,
-                        }
-                    ], { onConflict: 'id' });
+                    // خزّن الدور واسم المستخدم
+                    const { error: profileError } = await supabase
+                        .from('profiles')
+                        .upsert([
+                            {
+                                id: user.id,
+                                full_name: fullName,
+                                role: selectedRole,
+                            }
+                        ], { onConflict: 'id' });
 
                     if (profileError) {
-                        console.error('Error creating user profile:', profileError.message);
                         setMessage(`حدث خطأ أثناء إنشاء ملفك الشخصي: ${profileError.message}`);
                         return;
                     }
-
-                    setMessage('تم إنشاء الحساب! يمكنك تسجيل الدخول فورًا بدون الحاجة إلى تأكيد البريد.');
-                } else {
-                    // تحديث الرسالة:  
-                    setMessage('تم إنشاء الحساب! يمكنك الآن تسجيل الدخول مباشرة دون انتظار رسالة على البريد الإلكتروني.');
                 }
+                setMessage('تم إنشاء الحساب وتسجيل الدخول بنجاح!');
             }
         } catch (error: any) {
             setMessage(`خطأ: ${error.message}`);
-            console.error('Auth error:', error.message);
         } finally {
             setLoading(false);
         }
