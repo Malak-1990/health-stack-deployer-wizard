@@ -1,7 +1,6 @@
 
 import { useLanguage } from '@/contexts/LanguageContext';
 import AdvancedSettings from '@/components/settings/AdvancedSettings';
-import RoleSwitcher from '@/components/settings/RoleSwitcher';
 import LogoutButton from '@/components/LogoutButton';
 import { Settings as SettingsIcon, User } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
