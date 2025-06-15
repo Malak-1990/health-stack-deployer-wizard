@@ -1,6 +1,8 @@
 
 import { supabase } from '@/integrations/supabase/client';
 
+const SUPABASE_FUNCTIONS_URL = "https://uzxjjuursjgymtgfkgxd.supabase.co/functions/v1"; // استخدم رابط مشروعك مباشرة
+
 class AdminService {
   private async callAdminFunction(action: string, filters?: any) {
     const { data: { session } } = await supabase.auth.getSession();
@@ -9,7 +11,7 @@ class AdminService {
       throw new Error('No authenticated session');
     }
 
-    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-data-access`, {
+    const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/admin-data-access`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${session.access_token}`,
@@ -49,3 +51,4 @@ class AdminService {
 }
 
 export const adminService = new AdminService();
+
