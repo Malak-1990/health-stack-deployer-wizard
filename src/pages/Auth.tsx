@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
@@ -9,7 +8,7 @@ const AuthPage: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [fullName, setFullName] = useState('');
-    const [selectedRole, setSelectedRole] = useState<'patient' | 'doctor' | 'family' | 'admin'>('patient');
+    const [selectedRole, setSelectedRole] = useState<'patient' | 'doctor' | 'family'>('patient');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
     const navigate = useNavigate();
@@ -116,8 +115,8 @@ const AuthPage: React.FC = () => {
                     {!isLogin && (
                         <div>
                             <h3 className="text-lg font-semibold text-gray-700 mb-3">اختر نوع المستخدم:</h3>
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                                {['patient', 'doctor', 'family', 'admin'].map((roleOption) => (
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                {['patient', 'doctor', 'family'].map((roleOption) => (
                                     <button
                                         key={roleOption}
                                         type="button"
@@ -131,7 +130,6 @@ const AuthPage: React.FC = () => {
                                         {roleOption === 'patient' && 'مريض'}
                                         {roleOption === 'doctor' && 'طبيب'}
                                         {roleOption === 'family' && 'فرد عائلة'}
-                                        {roleOption === 'admin' && 'مشرف'}
                                     </button>
                                 ))}
                             </div>
