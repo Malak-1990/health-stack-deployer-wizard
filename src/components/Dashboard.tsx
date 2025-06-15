@@ -18,6 +18,9 @@ const Dashboard = () => {
         try {
           console.log('Fetching role for user:', user.id, user.email);
           
+          // First check if this is the admin email
+          const isAdminEmail = user.email === 'malaksalama21@gmail.com';
+          
           const { data: profile, error } = await supabase
             .from('profiles')
             .select('role, full_name')
@@ -31,9 +34,9 @@ const Dashboard = () => {
 
           if (error) {
             console.error('Error fetching user role:', error);
-            // If there's an error, create the profile with admin role for your email
-            if (user.email === 'malaksalama21@gmail.com') {
-              console.log('Creating admin profile for:', user.email);
+            // If there's an error and this is the admin email, force admin role
+            if (isAdminEmail) {
+              console.log('Admin email detected, creating admin profile:', user.email);
               const { error: insertError } = await supabase
                 .from('profiles')
                 .upsert([
@@ -51,10 +54,23 @@ const Dashboard = () => {
           } else if (profile && profile.role) {
             console.log('Found user role in database:', profile.role);
             finalRole = profile.role;
+            
+            // Double check: if this is admin email but role is not admin, fix it
+            if (isAdminEmail && profile.role !== 'admin') {
+              console.log('Admin email found but role is not admin, fixing...');
+              const { error: updateError } = await supabase
+                .from('profiles')
+                .update({ role: 'admin' })
+                .eq('id', user.id);
+              
+              if (!updateError) {
+                finalRole = 'admin';
+              }
+            }
           } else {
-            // If no role found, but this is your email, make admin
-            if (user.email === 'malaksalama21@gmail.com') {
-              console.log('No role found, creating admin for:', user.email);
+            // If no role found and this is admin email, make admin
+            if (isAdminEmail) {
+              console.log('No role found for admin email, creating admin profile:', user.email);
               const { error: updateError } = await supabase
                 .from('profiles')
                 .upsert([
@@ -97,15 +113,30 @@ const Dashboard = () => {
               break;
           }
           
-          console.log('Setting role to:', frontendRole, 'Redirecting to:', targetPath);
+          console.log('Final role determination:', {
+            email: user.email,
+            isAdminEmail,
+            dbRole: finalRole,
+            frontendRole,
+            targetPath
+          });
+          
           setUserRole(frontendRole);
           setRedirectPath(targetPath);
           
         } catch (error) {
           console.error('Unexpected error:', error);
-          setUserDbRole('user');
-          setUserRole('patient');
-          setRedirectPath('/patient-dashboard');
+          // Fallback for admin email even on error
+          if (user.email === 'malaksalama21@gmail.com') {
+            console.log('Error occurred but admin email detected, setting admin role');
+            setUserDbRole('admin');
+            setUserRole('admin');
+            setRedirectPath('/admin-dashboard');
+          } else {
+            setUserDbRole('user');
+            setUserRole('patient');
+            setRedirectPath('/patient-dashboard');
+          }
         }
       }
       setCheckingRole(false);
@@ -127,6 +158,9 @@ const Dashboard = () => {
               <p>معرف المستخدم: {user.id}</p>
               <p>الدور من قاعدة البيانات: {userDbRole || 'جاري التحميل...'}</p>
               <p>نوع المستخدم: {userRole}</p>
+              {user.email === 'malaksalama21@gmail.com' && (
+                <p className="text-blue-600 font-medium">✓ مستخدم مشرف مؤكد</p>
+              )}
             </div>
           )}
         </div>
