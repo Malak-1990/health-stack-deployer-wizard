@@ -160,6 +160,30 @@
   }
 }
 
+/* Hide Lovable Badge - Alternative for non-paid plans */
+[data-lovable-badge],
+[data-lovable-watermark],
+.lovable-badge,
+.lovable-watermark,
+iframe[src*="lovable"],
+div[class*="lovable"],
+a[href*="lovable.dev"]:not([href*="docs"]),
+button[class*="lovable"],
+div[style*="lovable"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Additional selectors for common badge patterns */
+div[class*="watermark"],
+div[class*="badge"][class*="edit"],
+a[class*="edit"][class*="badge"],
+button[class*="edit"][class*="badge"] {
+  display: none !important;
+}
+
 /* Custom animations for enhanced UX */
 @keyframes heartbeat {
   0%, 100% { transform: scale(1); }
