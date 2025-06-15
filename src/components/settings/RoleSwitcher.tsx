@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useRole, UserRole } from '@/contexts/RoleContext';
 import { useAuth } from '@/hooks/useAuth';
@@ -21,7 +20,7 @@ const RoleSwitcher = () => {
     patient: 'مريض',
     doctor: 'طبيب', 
     family: 'عائلة',
-    admin: 'مدير'
+    admin: 'admin'
   };
 
   // Map frontend roles to database roles
@@ -139,7 +138,7 @@ const RoleSwitcher = () => {
                 <SelectItem value="patient">🩺 مريض</SelectItem>
                 <SelectItem value="doctor">👨‍⚕️ طبيب</SelectItem>
                 <SelectItem value="family">👨‍👩‍👧‍👦 عائلة</SelectItem>
-                <SelectItem value="admin">⚡ مدير</SelectItem>
+                <SelectItem value="admin">⚡ admin</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -157,7 +156,7 @@ const RoleSwitcher = () => {
         {user?.email === 'malaksalama21@gmail.com' && (
           <div className="bg-blue-50 p-3 rounded-lg">
             <p className="text-xs text-blue-700">
-              💡 <strong>ملاحظة:</strong> بصفتك مطور التطبيق، يجب أن يكون نوعك "مدير"
+              💡 <strong>ملاحظة:</strong> بصفتك مطور التطبيق، يجب أن يكون نوعك "admin"
             </p>
           </div>
         )}
