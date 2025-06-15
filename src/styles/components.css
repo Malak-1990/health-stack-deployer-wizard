@@ -1,0 +1,57 @@
+
+/* Better touch targets */
+button, a, [role="button"] {
+  @apply min-h-[44px] min-w-[44px];
+}
+
+/* Improved scrolling */
+* {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* PWA specific styles */
+@media (display-mode: standalone) {
+  body {
+    @apply select-none;
+  }
+  
+  /* Hide scrollbars in PWA mode for cleaner look */
+  ::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+  }
+}
+
+/* Loading spinner improvements */
+.loading-spinner {
+  @apply animate-spin rounded-full border-2 border-t-transparent;
+}
+
+/* Custom scrollbar for better UX */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 rounded-lg;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-lg hover:bg-gray-400;
+}
+
+/* Focus improvements for accessibility */
+button:focus,
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}

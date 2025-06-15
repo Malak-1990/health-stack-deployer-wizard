@@ -1,0 +1,42 @@
+
+/* Mobile specific improvements */
+@media (max-width: 768px) {
+  /* Ensure better spacing on mobile */
+  .container {
+    @apply px-4;
+  }
+  
+  /* Better card sizing */
+  .card {
+    @apply mx-2;
+  }
+  
+  /* Improved text sizing */
+  h1 {
+    @apply text-2xl;
+  }
+  
+  h2 {
+    @apply text-xl;
+  }
+  
+  /* Better button sizing for touch */
+  button {
+    @apply py-3 px-4 text-base;
+  }
+}
+
+/* Arabic RTL improvements */
+[dir="rtl"] {
+  text-align: right;
+}
+
+[dir="rtl"] .space-x-2 > * + * {
+  margin-right: 0.5rem;
+  margin-left: 0;
+}
+
+[dir="rtl"] .space-x-4 > * + * {
+  margin-right: 1rem;
+  margin-left: 0;
+}
