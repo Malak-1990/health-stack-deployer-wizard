@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, ShieldCheck, Stethoscope, Clock, Users, BarChart2, UserPlus, Activity, Bell, FileText, Download, ArrowLeft } from 'lucide-react';
@@ -115,7 +116,7 @@ const LandingPage: React.FC = () => {
             </nav>
 
             <main className="pt-20">
-                {/* Section: Project Overview, Key Features, and Technologies Used */}
+                {/* Section: Project Overview، Key Features، and Technologies Used */}
                 <section id="project-overview" className="py-12 px-4 bg-white">
                     <div className="container mx-auto text-center">
                         {/* Project Title & Slogan */}
@@ -182,7 +183,7 @@ const LandingPage: React.FC = () => {
                     </div>
                 </section>
 
-                {/* Hero Section: Main Title, Slogan, CTA, and Core Values */}
+                {/* Hero Section: Main Title، Slogan، CTA، and Core Values */}
                 <section id="hero" className="bg-gradient-to-br from-[#03045E] to-[#0077B6] text-white py-12 px-4 text-center relative overflow-hidden">
                     <div className="absolute inset-0 opacity-10" style={{ backgroundImage: `url('https://placehold.co/1200x800/FFFFFF/CCCCCC?text=Heart%20Monitor%20Pattern')`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}></div>
                     
@@ -366,7 +367,7 @@ const LandingPage: React.FC = () => {
                         <p className="text-base md:text-lg mb-6 max-w-3xl mx-auto">
                             انضم إلى آلاف المستخدمين الذين يثقون في نظامنا لمراقبة صحتهم.
                         </p>
-                        <Link to="/auth" className="inline-block bg-[#00B4D8] text-[#03045E] font-bold text-lg md:text-xl px-8 py-3 rounded-full hover:bg-opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                        <Link to="/auth" className="inline-block bg-[#00B4D8] text-[#03045E] font-bold text-lg m d:text-xl px-8 py-3 rounded-full hover:bg-opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg">
                             ابدأ التجربة المجانية
                         </Link>
                     </div>
@@ -376,9 +377,8 @@ const LandingPage: React.FC = () => {
             {/* Footer */}
             <footer className="bg-[#03045E] text-[#CAF0F8] py-6 text-center">
                 <div className="container mx-auto text-sm">
-                    <div className="flex justify-between items-center">
-                        <span>&copy; 2025 - جميع الحقوق محفوظة</span>
-                        <span>ملاك سنتر للخدمات الأكاديمية</span>
+                    <div className="text-center">
+                        <span>&copy; 2025 - جميع الحقوق محفوظة - ملاك سنتر للخدمات الأكاديمية</span>
                     </div>
                 </div>
             </footer>

@@ -67,13 +67,17 @@ const AuthPage: React.FC = () => {
                 {/* Logo and University Header */}
                 <div className="flex items-center justify-center mb-6">
                     <img 
-                        src="/lovable-uploads/1d5bbf79-3e01-4978-8149-e5c89b8136b2.png" 
-                        alt="University Logo" 
-                        className="w-12 h-12 mr-3"
+                        src="/lovable-uploads/8e458822-aeb4-4983-89dc-16e2b6e10938.png" 
+                        alt="شعار جامعة الزاوية وكلية العلوم العجيلات" 
+                        className="w-12 h-12 mr-3 rounded-full"
+                        onError={(e) => { 
+                            e.currentTarget.onerror = null; 
+                            e.currentTarget.src='https://placehold.co/50x50/CCCCCC/888888?text=شعار'; 
+                        }}
                     />
                     <div className="text-right">
-                        <h1 className="text-lg font-bold text-[#03045E]">جامعة الإسكندرية</h1>
-                        <p className="text-sm text-gray-600">كلية الهندسة</p>
+                        <h1 className="text-lg font-bold text-[#03045E]">جامعة الزاوية</h1>
+                        <p className="text-sm text-gray-600">كلية العلوم العجيلات</p>
                     </div>
                 </div>
 
