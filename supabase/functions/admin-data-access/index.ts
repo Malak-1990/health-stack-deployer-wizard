@@ -1,26 +1,34 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-/** Supported admin actions */
-type AdminAction = 'getStats' | 'getAllUsers' | 'getAllAlerts' | 'getSystemActivity' | 'updateUserRole';
+// Admin actions supported
+type AdminAction =
+  | 'getStats'
+  | 'getAllUsers'
+  | 'getAllAlerts'
+  | 'getSystemActivity'
+  | 'updateUserRole';
 
-/** Payload structure for incoming requests */
+// Payload structure for incoming requests
 interface RequestPayload {
   action: AdminAction;
   table?: string;
-  filters?: Record<string, any>;
+  filters?: Record<string, unknown>;
   limit?: number;
   offset?: number;
 }
 
+const DEFAULT_LIMIT = 100;
+const DEFAULT_OFFSET = 0;
+const SYSTEM_ACTIVITY_LIMIT = 50;
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'X-Content-Type-Options': 'nosniff',
+  'Referrer-Policy': 'no-referrer'
 };
 
-/**
- * Validates that required environment variables exist and returns them.
- */
 function getSupabaseEnv() {
   const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
   const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
@@ -30,19 +38,13 @@ function getSupabaseEnv() {
   return { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY };
 }
 
-/**
- * Extracts and validates the Bearer token from the Authorization header.
- */
 function getBearerToken(authHeader: string | null): string {
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    throw new Error('Missing or malformed authorization header');
+  if (!authHeader?.startsWith('Bearer ')) {
+    throw new Error('Unauthorized');
   }
-  return authHeader.replace('Bearer ', '');
+  return authHeader.slice(7);
 }
 
-/**
- * Validates the request payload and returns a typed object.
- */
 function validatePayload(payload: any): RequestPayload {
   const allowedActions: AdminAction[] = [
     'getStats', 'getAllUsers', 'getAllAlerts', 'getSystemActivity', 'updateUserRole'
@@ -53,18 +55,11 @@ function validatePayload(payload: any): RequestPayload {
   if (payload.filters && typeof payload.filters !== 'object') {
     throw new Error('Filters must be an object.');
   }
-  if ((payload.limit && typeof payload.limit !== 'number') || payload.limit < 1) {
-    payload.limit = 100;
-  }
-  if ((payload.offset && typeof payload.offset !== 'number') || payload.offset < 0) {
-    payload.offset = 0;
-  }
+  payload.limit = typeof payload.limit === 'number' && payload.limit > 0 ? payload.limit : DEFAULT_LIMIT;
+  payload.offset = typeof payload.offset === 'number' && payload.offset >= 0 ? payload.offset : DEFAULT_OFFSET;
   return payload as RequestPayload;
 }
 
-/**
- * Confirms that the given user is an admin.
- */
 async function verifyAdminRole(supabase: SupabaseClient, userId: string): Promise<void> {
   const { data: profile, error } = await supabase
     .from('profiles')
@@ -72,13 +67,12 @@ async function verifyAdminRole(supabase: SupabaseClient, userId: string): Promis
     .eq('id', userId)
     .single();
   if (error || !profile || profile.role !== 'admin') {
-    throw new Error('Access denied: Admin role required');
+    throw new Error('Forbidden');
   }
 }
 
-/**
- * Fetches dashboard statistics.
- */
+// Data actions
+
 async function getStats(supabase: SupabaseClient) {
   const [
     { count: totalUsers },
@@ -102,165 +96,106 @@ async function getStats(supabase: SupabaseClient) {
   };
 }
 
-/**
- * Fetches all users with their profiles, paginated.
- */
-async function getAllUsers(supabase: SupabaseClient, limit = 100, offset = 0) {
-  const { data: users, error } = await supabase
+async function getAllUsers(supabase: SupabaseClient, limit: number, offset: number) {
+  const { data, error } = await supabase
     .from('profiles')
-    .select(`
-      id,
-      full_name,
-      role,
-      created_at,
-      emergency_contact_name,
-      emergency_contact_phone
-    `)
+    .select('id, full_name, role, created_at, emergency_contact_name, emergency_contact_phone')
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1);
-
-  if (error) throw error;
-  return users;
+  if (error) throw new Error('Failed to fetch users');
+  return data;
 }
 
-/**
- * Fetches all alerts with user information, paginated.
- */
-async function getAllAlerts(supabase: SupabaseClient, limit = 100, offset = 0) {
-  const { data: alerts, error } = await supabase
+async function getAllAlerts(supabase: SupabaseClient, limit: number, offset: number) {
+  const { data, error } = await supabase
     .from('smart_alerts')
-    .select(`
-      *,
-      profiles!inner(full_name, role)
-    `)
+    .select('*, profiles!inner(full_name, role)')
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1);
-
-  if (error) throw error;
-  return alerts;
+  if (error) throw new Error('Failed to fetch alerts');
+  return data;
 }
 
-/**
- * Fetches recent system activity.
- */
-async function getSystemActivity(supabase: SupabaseClient, limit = 50, offset = 0) {
-  const { data: recentReadings, error } = await supabase
+async function getSystemActivity(supabase: SupabaseClient, limit: number, offset: number) {
+  const { data, error } = await supabase
     .from('heart_rate_readings')
-    .select(`
-      id,
-      heart_rate,
-      recorded_at,
-      profiles!inner(full_name)
-    `)
+    .select('id, heart_rate, recorded_at, profiles!inner(full_name)')
     .order('recorded_at', { ascending: false })
     .range(offset, offset + limit - 1);
-
-  if (error) throw error;
-  return recentReadings;
+  if (error) throw new Error('Failed to fetch activity');
+  return data;
 }
 
-/**
- * Updates a user's role.
- */
 async function updateUserRole(supabase: SupabaseClient, filters: any) {
-  if (!filters || typeof filters !== 'object' || !filters.userId || !filters.newRole) {
+  if (!filters?.userId || !filters?.newRole) {
     throw new Error('userId and newRole are required in filters');
   }
-  const { data: updatedUser, error } = await supabase
+  const { data, error } = await supabase
     .from('profiles')
     .update({ role: filters.newRole })
     .eq('id', filters.userId)
     .select();
-
-  if (error) throw error;
-  return updatedUser;
+  if (error) throw new Error('Failed to update user role');
+  return data;
 }
 
-/**
- * Main handler for incoming HTTP requests.
- */
+// Action dispatcher
+const actionHandlers: Record<AdminAction, Function> = {
+  getStats: async (supabase: SupabaseClient) => getStats(supabase),
+  getAllUsers: async (supabase: SupabaseClient, payload: RequestPayload) =>
+    getAllUsers(supabase, payload.limit!, payload.offset!),
+  getAllAlerts: async (supabase: SupabaseClient, payload: RequestPayload) =>
+    getAllAlerts(supabase, payload.limit!, payload.offset!),
+  getSystemActivity: async (supabase: SupabaseClient, payload: RequestPayload) =>
+    getSystemActivity(supabase, payload.limit ?? SYSTEM_ACTIVITY_LIMIT, payload.offset!),
+  updateUserRole: async (supabase: SupabaseClient, payload: RequestPayload) =>
+    updateUserRole(supabase, payload.filters)
+};
+
 serve(async (req: Request) => {
-  // Handle CORS preflight
+  // CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Use a unique requestId for logging and tracing
   const requestId = crypto.randomUUID();
 
   try {
-    // Environment variables
     const { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } = getSupabaseEnv();
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Authorization
+    // Auth
     const authHeader = req.headers.get('Authorization');
     const token = getBearerToken(authHeader);
 
-    // Validate and get user
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     if (authError || !user) throw new Error('Unauthorized');
 
-    // Admin check
     await verifyAdminRole(supabase, user.id);
 
-    // Parse and validate payload
     const payload = validatePayload(await req.json());
 
-    // Logging the action
     console.info(`[${requestId}] Action: ${payload.action} by User: ${user.id}`);
 
-    // Dispatch action
-    let result: any;
-    switch (payload.action) {
-      case 'getStats':
-        result = await getStats(supabase);
-        break;
-      case 'getAllUsers':
-        result = await getAllUsers(
-          supabase,
-          payload.limit ?? 100,
-          payload.offset ?? 0
-        );
-        break;
-      case 'getAllAlerts':
-        result = await getAllAlerts(
-          supabase,
-          payload.limit ?? 100,
-          payload.offset ?? 0
-        );
-        break;
-      case 'getSystemActivity':
-        result = await getSystemActivity(
-          supabase,
-          payload.limit ?? 50,
-          payload.offset ?? 0
-        );
-        break;
-      case 'updateUserRole':
-        result = await updateUserRole(supabase, payload.filters);
-        break;
-      default:
-        throw new Error('Invalid action');
-    }
+    const handler = actionHandlers[payload.action];
+    if (!handler) throw new Error('Invalid action');
 
-    // Success response
+    const result = await handler(supabase, payload);
+
     return new Response(
       JSON.stringify({ success: true, data: result, requestId }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     );
-  } catch (error: any) {
-    // Enhanced error logging
-    console.error(`[${requestId}] Error:`, error?.stack || error?.message || error);
+  } catch (err: any) {
+    // Hide stack trace from client, log internally
+    const status =
+      err.message === 'Unauthorized' ? 401 :
+      err.message === 'Forbidden'   ? 403 :
+      400;
+    console.error(`[${requestId}] Error:`, err?.stack || err?.message || err);
     return new Response(
-      JSON.stringify({ success: false, error: error.message, requestId }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400,
-      }
+      JSON.stringify({ success: false, error: err.message || 'Unknown error', requestId }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status }
     );
   }
 });
