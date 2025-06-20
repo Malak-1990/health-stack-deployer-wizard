@@ -16,4 +16,9 @@
     "noUnusedLocals": false,
     "strictNullChecks": false
   }
+{
+  "compilerOptions": {
+    "...": "...",
+    "strict": true
+  }
 }
