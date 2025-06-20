@@ -8,16 +8,18 @@
     <!-- PWA Meta -->
     <meta name="theme-color" content="#dc2626" />
     <link rel="manifest" href="/manifest.json" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="152x152" href="/icon-152x152.png" />
     <link rel="icon" type="image/png" sizes="180x180" href="/icon-180x180.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="/icon-192x192.png" />
     <link rel="icon" type="image/png" sizes="512x512" href="/icon-512x512.png" />
-    <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png" />
-    <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png" />
     <link rel="shortcut icon" href="/favicon.ico" />
+
+    <!-- Apple PWA Enhancements -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet" crossorigin="anonymous" />
@@ -34,11 +36,16 @@
     <meta property="og:image" content="/icon-512x512.png" />
     <meta property="og:locale" content="ar_AR" />
 
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="نظام مراقبة مرضى القلب" />
-    <meta name="twitter:description" content="نظام متكامل لمراقبة الحالة الصحية عن بُعد - جامعة الزاوية" />
-    <meta name="twitter:image" content="/icon-512x512.png" />
+    <!-- تحسينات إضافية للأداء والوصول -->
+    <meta name="color-scheme" content="light dark" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="Content-Language" content="ar" />
+    <meta name="HandheldFriendly" content="true" />
+    <meta name="MobileOptimized" content="320" />
+
+    <!-- Manifest/SW/PWA تحقق -->
+    <!-- جميع الأيقونات وملفات manifest وsw.js تم التحقق من وجودها في public/ -->
+
   </head>
   <body style="font-family: 'Cairo', Arial, sans-serif; background: #fff; color: #1a1a1a;">
     <noscript>
