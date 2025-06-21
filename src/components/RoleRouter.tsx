@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../supabaseClient"; // Adjust if path differs
+import { supabase } from "../supabaseClient";
 
-import DoctorDashboard from "./DoctorDashboard";
-import PatientDashboard from "./PatientDashboard";
-import FamilyDashboard from "./FamilyDashboard";
-import AdminUserManager from "./AdminUserManager";
+// ✅ استيراد من صفحات الواجهة الفعلية
+import DoctorDashboard from "../pages/DoctorDashboardPage";
+import PatientDashboard from "../pages/PatientDashboardPage";
+import FamilyDashboard from "../pages/FamilyDashboardPage";
+import AdminDashboard from "../pages/AdminDashboard";
 
 type RoleType = "doctor" | "patient" | "family" | "admin";
 
@@ -87,7 +88,7 @@ const RoleRouter: React.FC = () => {
     case "family":
       return <FamilyDashboard />;
     case "admin":
-      return <AdminUserManager />;
+      return <AdminDashboard />;
     default:
       navigate("/auth", { replace: true });
       return null;
