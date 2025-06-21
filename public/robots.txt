@@ -1,6 +1,8 @@
-# Allow all crawlers
+# robots.txt for health-stack-deployer-wizard
+# Allow all crawlers access to your app
+
 User-agent: *
 Allow: /
 
-# If you add a sitemap in the future, uncomment and update the line below:
+# When you have a domain and sitemap, update and uncomment the line below:
 # Sitemap: https://your-domain.com/sitemap.xml
