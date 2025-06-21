@@ -10,34 +10,28 @@
     <link rel="icon" href="/favicon.ico" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-    <link rel="apple-touch-icon" sizes="152x152" href="/icon-152x152.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/icon-180x180.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="/icon-192x192.png" />
     <link rel="icon" type="image/png" sizes="512x512" href="/icon-512x512.png" />
 
-    <!-- SEO Meta Tags -->
-    <title>health-stack-deployer-wizard</title>
+    <!-- SEO & Social Meta -->
+    <title>Health Stack Deployer Wizard</title>
     <meta name="description" content="تطبيق متكامل لنشر حلول الصحة الإلكترونية مع دعم كامل للغة العربية، PWA، وتحسين التوافق مع الأجهزة المحمولة وسرعة الأداء." />
     <meta name="theme-color" content="#009688" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-
-    <!-- Social & Open Graph -->
-    <meta property="og:title" content="health-stack-deployer-wizard" />
+    <meta property="og:title" content="Health Stack Deployer Wizard" />
     <meta property="og:description" content="تطبيق متكامل لنشر حلول الصحة الإلكترونية مع دعم كامل للغة العربية وPWA." />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="ar_AR" />
     <meta property="og:image" content="/icon-512x512.png" />
     <meta name="twitter:card" content="summary_large_image" />
-
-    <!-- Robots -->
     <meta name="robots" content="index, follow" />
 
-    <!-- Responsive & Accessible Font (Google Fonts Cairo) -->
+    <!-- Google Fonts: Cairo -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet" />
 
-    <!-- Basic Styles for RTL, Responsive, and Accessibility -->
     <style>
       html, body {
         height: 100%;
@@ -62,16 +56,13 @@
     </style>
   </head>
   <body>
-    <noscript lang="ar">
-      برجاء تفعيل الجافاسكريبت لتعمل جميع مزايا التطبيق.
-    </noscript>
+    <noscript lang="ar">برجاء تفعيل الجافاسكريبت لتعمل جميع مزايا التطبيق.</noscript>
     <div id="root" tabindex="-1"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <!-- Register service worker for PWA (Vite auto-injects if using Vite PWA plugin) -->
     <script>
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
         });
       }
     </script>
