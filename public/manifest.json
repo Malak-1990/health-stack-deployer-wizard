@@ -1,36 +1,23 @@
 {
-  "name": "نظام مراقبة مرضى القلب",
-  "short_name": "مراقبة القلب",
-  "description": "نظام متكامل لمراقبة الحالة الصحية عن بُعد - جامعة الزاوية",
-  "theme_color": "#dc2626",
-  "background_color": "#ffffff",
-  "display": "standalone",
-  "orientation": "portrait",
-  "scope": "/",
-  "start_url": "/",
+  "name": "health-stack-deployer-wizard",
+  "short_name": "HSD Wizard",
+  "description": "تطبيق متكامل لنشر حلول الصحة الإلكترونية",
   "lang": "ar",
   "dir": "rtl",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#009688",
   "icons": [
-    { "src": "/icon-152x152.png", "sizes": "152x152", "type": "image/png", "purpose": "maskable any" },
-    { "src": "/icon-180x180.png", "sizes": "180x180", "type": "image/png", "purpose": "maskable any" },
-    { "src": "/icon-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable any" },
-    { "src": "/icon-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable any" }
-  ],
-  "categories": ["medical", "health", "utilities"],
-  "shortcuts": [
     {
-      "name": "لوحة تحكم المريض",
-      "short_name": "مريض",
-      "description": "مراقبة معدل ضربات القلب",
-      "url": "/patient-dashboard",
-      "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
+      "src": "icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
     },
     {
-      "name": "لوحة تحكم الطبيب",
-      "short_name": "طبيب",
-      "description": "متابعة المرضى",
-      "url": "/doctor-dashboard",
-      "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
+      "src": "icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
     }
   ]
 }
