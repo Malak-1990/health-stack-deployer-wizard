@@ -1,39 +1,37 @@
 {
   "name": "Health Stack Deployer Wizard",
-  "short_name": "HSD Wizard",
-  "description": "منصة متقدمة لإدارة وتتبع المعلومات الصحية تدعم العربية وPWA وتعمل بكفاءة على جميع الأجهزة.",
+  "short_name": "HealthStack",
+  "description": "تطبيق متكامل لنشر حلول الصحة الإلكترونية مع دعم كامل للغة العربية وPWA.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fff",
+  "theme_color": "#009688",
   "lang": "ar",
   "dir": "rtl",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#009688",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "icon-192x192.png",
+      "src": "/icon-192x192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "icon-512x512.png",
+      "src": "/icon-512x512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "favicon-32x32.png",
+      "src": "/favicon-32x32.png",
       "sizes": "32x32",
       "type": "image/png"
     },
     {
-      "src": "favicon-16x16.png",
+      "src": "/favicon-16x16.png",
       "sizes": "16x16",
       "type": "image/png"
-    },
-    {
-      "src": "apple-touch-icon.png",
-      "sizes": "180x180",
-      "type": "image/png",
-      "purpose": "any maskable"
     }
   ]
 }
