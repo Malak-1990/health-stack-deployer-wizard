@@ -1,10 +1,12 @@
-import { defineConfig } from 'vite';
+import { defineConfig, type UserConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
   plugins: [
-    react(),
+    react({
+      devOptions: { fastRefresh: true }
+    }),
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
@@ -27,21 +29,26 @@ export default defineConfig({
         ],
         shortcuts: [
           {
-            "name": "لوحة تحكم المريض",
-            "short_name": "مريض",
-            "description": "مراقبة معدل ضربات القلب",
-            "url": "/patient-dashboard",
-            "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
+            name: "لوحة تحكم المريض",
+            short_name: "مريض",
+            description: "مراقبة معدل ضربات القلب",
+            url: "/patient-dashboard",
+            icons: [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
           },
           {
-            "name": "لوحة تحكم الطبيب",
-            "short_name": "طبيب",
-            "description": "متابعة المرضى",
-            "url": "/doctor-dashboard",
-            "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
+            name: "لوحة تحكم الطبيب",
+            short_name: "طبيب",
+            description: "متابعة المرضى",
+            url: "/doctor-dashboard",
+            icons: [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
           }
         ]
       }
     })
-  ]
-});
+  ],
+  build: {
+    sourcemap: true,
+    target: "esnext"
+  }
+} satisfies UserConfig);
+
