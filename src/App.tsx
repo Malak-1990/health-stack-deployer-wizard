@@ -6,18 +6,17 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { RoleProvider } from "@/contexts/RoleContext";
-import Landing from "./pages/Landing";
-import Auth from "./pages/Auth";
-import RoleRouter from "./components/RoleRouter";
-import Dashboard from "./components/Dashboard";
-import PatientDashboardPage from "./pages/PatientDashboardPage";
-import DoctorDashboardPage from "./pages/DoctorDashboardPage";
-import FamilyDashboardPage from "./pages/FamilyDashboardPage";
-import AdminDashboard from "./pages/AdminDashboard";
-import Settings from "./pages/Settings";
-import NotFound from "./pages/NotFound";
-import ProtectedRoute from "./components/ProtectedRoute";
-import ContactPage from './pages/Contact';
+import Landing from "@/pages/Landing";
+import Auth from "@/pages/Auth";
+import RoleRouter from "@/components/RoleRouter";
+import DoctorDashboard from "@/components/DoctorDashboard";
+import PatientDashboard from "@/components/PatientDashboard";
+import FamilyDashboard from "@/components/FamilyDashboard";
+import AdminUserManager from "@/components/AdminUserManager";
+import Settings from "@/pages/Settings";
+import NotFound from "@/pages/NotFound";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import ContactPage from "@/pages/Contact";
 
 const queryClient = new QueryClient();
 
@@ -37,7 +36,7 @@ function App() {
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/contact" element={<ContactPage />} />
 
-                  {/* Unified dashboard entry: redirects to the correct dashboard based on user role */}
+                  {/* Role-based dashboard routing */}
                   <Route
                     path="/dashboard"
                     element={
@@ -47,20 +46,20 @@ function App() {
                     }
                   />
 
-                  {/* Direct dashboard routes for each role (still protected, for deep linking/bookmarks) */}
-                  <Route
-                    path="/patient-dashboard"
-                    element={
-                      <ProtectedRoute>
-                        <PatientDashboardPage />
-                      </ProtectedRoute>
-                    }
-                  />
+                  {/* Direct dashboard access for deep links/bookmarks */}
                   <Route
                     path="/doctor-dashboard"
                     element={
                       <ProtectedRoute>
-                        <DoctorDashboardPage />
+                        <DoctorDashboard />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/patient-dashboard"
+                    element={
+                      <ProtectedRoute>
+                        <PatientDashboard />
                       </ProtectedRoute>
                     }
                   />
@@ -68,7 +67,7 @@ function App() {
                     path="/family-dashboard"
                     element={
                       <ProtectedRoute>
-                        <FamilyDashboardPage />
+                        <FamilyDashboard />
                       </ProtectedRoute>
                     }
                   />
@@ -76,7 +75,7 @@ function App() {
                     path="/admin-dashboard"
                     element={
                       <ProtectedRoute>
-                        <AdminDashboard />
+                        <AdminUserManager />
                       </ProtectedRoute>
                     }
                   />
