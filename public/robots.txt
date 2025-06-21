@@ -1,14 +1,10 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
+# Allow all crawlers
 User-agent: *
 Allow: /
+
+# Sitemap (update URL if you use a custom domain)
+Sitemap: https://your-domain.com/sitemap.xml
+
+# Block sensitive folders if needed (uncomment if you have these)
+# Disallow: /api/
+# Disallow: /private/
