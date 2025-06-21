@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from "react";
+// src/components/RoleRouter.tsx
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 
-// ✅ استيراد من صفحات الواجهة الفعلية
-import DoctorDashboard from "../pages/DoctorDashboardPage";
-import PatientDashboard from "../pages/PatientDashboardPage";
-import FamilyDashboard from "../pages/FamilyDashboardPage";
+// ✅ استيراد صفحات الواجهات
+import DoctorDashboardPage from "../pages/DoctorDashboardPage";
+import PatientDashboardPage from "../pages/PatientDashboardPage";
+import FamilyDashboardPage from "../pages/FamilyDashboardPage";
 import AdminDashboard from "../pages/AdminDashboard";
 
 type RoleType = "doctor" | "patient" | "family" | "admin";
 
-const RoleRouter: React.FC = () => {
+const RoleRouter = () => {
   const [role, setRole] = useState<RoleType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -19,17 +20,18 @@ const RoleRouter: React.FC = () => {
   useEffect(() => {
     let isMounted = true;
 
-    (async () => {
+    const fetchUserRole = async () => {
       setLoading(true);
       setError(null);
 
       const { data: { user }, error: userError } = await supabase.auth.getUser();
+
       if (userError || !user) {
         navigate("/auth", { replace: true });
         return;
       }
 
-      const { data, error: profileError } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("role")
         .eq("id", user.id)
@@ -37,31 +39,24 @@ const RoleRouter: React.FC = () => {
 
       if (!isMounted) return;
 
-      if (profileError) {
-        setError("خطأ في جلب بيانات الحساب. حاول لاحقاً.");
-        setRole(null);
+      if (profileError || !profile?.role) {
+        setError("تعذر جلب بيانات المستخدم. تأكد من إعداد الدور في جدول الحسابات.");
         setLoading(false);
         return;
       }
 
-      if (!data || !data.role) {
-        setError("لم يتم تعيين دور لهذا المستخدم.");
-        setRole(null);
-        setLoading(false);
-        return;
-      }
-
-      setRole(data.role as RoleType);
+      setRole(profile.role as RoleType);
       setLoading(false);
-    })();
+    };
 
+    fetchUserRole();
     return () => { isMounted = false };
   }, [navigate]);
 
   if (loading) {
     return (
       <main dir="rtl" lang="ar" className="flex items-center justify-center min-h-screen">
-        <span aria-busy="true" aria-live="polite">جاري التحميل...</span>
+        <span className="text-gray-700 text-lg font-semibold" aria-busy="true">جاري تحميل الواجهة...</span>
       </main>
     );
   }
@@ -69,10 +64,10 @@ const RoleRouter: React.FC = () => {
   if (error) {
     return (
       <main dir="rtl" lang="ar" className="flex flex-col items-center justify-center min-h-screen text-red-700">
-        <span role="alert">{error}</span>
+        <p className="text-lg font-medium">{error}</p>
         <button
           onClick={() => navigate("/auth", { replace: true })}
-          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded"
+          className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded"
         >
           العودة لتسجيل الدخول
         </button>
@@ -82,11 +77,11 @@ const RoleRouter: React.FC = () => {
 
   switch (role) {
     case "doctor":
-      return <DoctorDashboard />;
+      return <DoctorDashboardPage />;
     case "patient":
-      return <PatientDashboard />;
+      return <PatientDashboardPage />;
     case "family":
-      return <FamilyDashboard />;
+      return <FamilyDashboardPage />;
     case "admin":
       return <AdminDashboard />;
     default:
