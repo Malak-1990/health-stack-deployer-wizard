@@ -60,7 +60,7 @@ export default defineConfig({
     target: 'esnext',
     rollupOptions: {
       input: {
-        main: path.resolve(__dirname, 'public/index.html'), // 👈 هذا يحل المشكلة
+        main: path.resolve(__dirname, 'public/index.html'),
       }
     }
   }
