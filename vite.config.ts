@@ -4,12 +4,15 @@ import react from '@vitejs/plugin-react-swc';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
+  root: '.', // الجذر هو نفس المجلد الحالي
+  publicDir: 'public', // مجلد الملفات الثابتة
   plugins: [
     react({
       devOptions: { fastRefresh: true }
     }),
     VitePWA({
       registerType: 'autoUpdate',
+      includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png'], // حسب الحاجة
       manifest: {
         name: "نظام مراقبة مرضى القلب",
         short_name: "مراقبة القلب",
@@ -54,6 +57,11 @@ export default defineConfig({
   },
   build: {
     sourcemap: true,
-    target: "esnext"
+    target: 'esnext',
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'public/index.html'), // 👈 هذا يحل المشكلة
+      }
+    }
   }
 } satisfies UserConfig);
