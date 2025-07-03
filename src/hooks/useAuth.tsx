@@ -1,4 +1,3 @@
-
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -22,12 +21,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [hasRedirected, setHasRedirected] = useState(false);
   const { setUserRole } = useRole();
 
+  // Helper: persist role to localStorage
+  const persistUserRole = (role: UserRole | null) => {
+    if (role) {
+      localStorage.setItem('userRole', role);
+    } else {
+      localStorage.removeItem('userRole');
+    }
+  };
+
+  // Helper: get cached role
+  const getCachedUserRole = (): UserRole => {
+    const role = localStorage.getItem('userRole') as UserRole | null;
+    if (
+      role === 'admin' ||
+      role === 'doctor' ||
+      role === 'family' ||
+      role === 'patient'
+    ) {
+      return role;
+    }
+    return 'patient';
+  };
+
+  // Fetch role from Supabase profiles table and update context + storage
   const fetchAndSetUserRole = async (user: User) => {
     try {
-      const isAdminEmail = user.email === 'malaksalama21@gmail.com';
-      if (isAdminEmail) {
+      // Hardcoded admin email shortcut
+      if (user.email === 'malaksalama21@gmail.com') {
         setUserRole('admin');
-        return;
+        persistUserRole('admin');
+        return 'admin';
       }
 
       const { data: profile, error } = await supabase
@@ -39,17 +63,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (error) {
         console.error('Error fetching user role, defaulting to patient:', error.message);
         setUserRole('patient');
-        return;
+        persistUserRole('patient');
+        return 'patient';
       }
 
-      const dbRole = profile?.role;
       let finalRole: UserRole = 'patient';
 
-      switch (dbRole) {
+      switch (profile?.role) {
         case 'admin':
         case 'doctor':
         case 'family':
-          finalRole = dbRole;
+          finalRole = profile.role;
           break;
         case 'user':
         default:
@@ -57,9 +81,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           break;
       }
       setUserRole(finalRole);
+      persistUserRole(finalRole);
+      return finalRole;
     } catch (error) {
       console.error('Unexpected error fetching role:', error);
       setUserRole('patient');
+      persistUserRole('patient');
+      return 'patient';
     }
   };
 
@@ -67,57 +95,69 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     let mounted = true;
     setLoading(true);
 
+    // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         if (!mounted) return;
 
         console.log('Auth state change:', event, session?.user?.email);
+
         const currentUser = session?.user ?? null;
         setSession(session);
         setUser(currentUser);
 
-        const rolePromise = currentUser ? fetchAndSetUserRole(currentUser) : Promise.resolve(setUserRole(null));
-        
-        rolePromise.finally(() => {
-            if (mounted) setLoading(false);
-        });
+        if (currentUser) {
+          await fetchAndSetUserRole(currentUser);
+        } else {
+          setUserRole(null);
+          persistUserRole(null);
+        }
+
+        setLoading(false);
 
         if (event === 'SIGNED_IN' && session?.user && !hasRedirected) {
-          console.log('User signed in, redirecting to dashboard...');
           setHasRedirected(true);
+
           setTimeout(() => {
-            if (mounted) {
-              const currentPath = window.location.pathname;
-              if (currentPath === '/auth' || currentPath === '/') {
-                window.location.href = '/dashboard';
-              }
+            if (!mounted) return;
+
+            const currentPath = window.location.pathname;
+            if (currentPath === '/auth' || currentPath === '/') {
+              const role = getCachedUserRole();
+              window.location.href = `/dashboard/${role}`;
             }
           }, 100);
         }
 
         if (event === 'SIGNED_OUT') {
           setHasRedirected(false);
+          setUserRole(null);
+          persistUserRole(null);
         }
       }
     );
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-        if (!mounted) return;
-        const currentUser = session?.user ?? null;
-        setSession(session);
-        setUser(currentUser);
-        const rolePromise = currentUser ? fetchAndSetUserRole(currentUser) : Promise.resolve(setUserRole(null));
-        rolePromise.finally(() => {
-            if (mounted) setLoading(false);
-        });
-    });
+    // Initial session fetch on mount
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!mounted) return;
+      const currentUser = session?.user ?? null;
+      setSession(session);
+      setUser(currentUser);
 
+      if (currentUser) {
+        await fetchAndSetUserRole(currentUser);
+      } else {
+        setUserRole(null);
+        persistUserRole(null);
+      }
+      setLoading(false);
+    });
 
     return () => {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [setUserRole]);
+  }, [setUserRole, hasRedirected]);
 
   const signUp = async (email: string, password: string, fullName: string) => {
     setLoading(true);
@@ -130,7 +170,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           data: { full_name: fullName }
         }
       });
-      
+
       console.log('Sign up result:', error ? 'Error: ' + error.message : 'Success');
       return { error };
     } finally {
@@ -145,7 +185,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         email,
         password,
       });
-      
+
       console.log('Sign in result:', error ? 'Error: ' + error.message : 'Success');
       return { error };
     } finally {
@@ -157,9 +197,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setLoading(true);
     try {
       setHasRedirected(false);
+      setUserRole(null);
+      persistUserRole(null);
       await supabase.auth.signOut();
       console.log('User signed out');
-      // Redirect to landing page
       window.location.href = '/';
     } finally {
       setLoading(false);
@@ -167,14 +208,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      session,
-      loading,
-      signUp,
-      signIn,
-      signOut,
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        session,
+        loading,
+        signUp,
+        signIn,
+        signOut,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
