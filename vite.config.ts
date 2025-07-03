@@ -2,17 +2,18 @@ import path from 'path';
 import { defineConfig, type UserConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import { VitePWA } from 'vite-plugin-pwa';
+import { componentTagger } from "lovable-tagger";
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   server: {
+    host: "::",
     port: 8080
   },
-  root: '.', // الجذر هو نفس المجلد الحالي
-  publicDir: 'public', // مجلد الملفات الثابتة
   plugins: [
     react({
       devOptions: { fastRefresh: true }
     }),
+    mode === 'development' && componentTagger(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png'], // حسب الحاجة
@@ -52,7 +53,7 @@ export default defineConfig({
         ]
       }
     })
-  ],
+  ].filter(Boolean),
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src')
@@ -63,8 +64,8 @@ export default defineConfig({
     target: 'esnext',
     rollupOptions: {
       input: {
-        main: path.resolve(__dirname, 'public/index.html'),
+        main: path.resolve(__dirname, 'index.html'),
       }
     }
   }
-} satisfies UserConfig);
+}));
