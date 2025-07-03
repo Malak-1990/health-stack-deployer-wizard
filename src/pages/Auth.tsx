@@ -157,12 +157,16 @@ const AuthPage: React.FC = () => {
         setMessage('تم تسجيل الدخول بنجاح. جاري التوجيه...');
         setTimeout(() => navigate('/dashboard'), 1500);
       } else {
-        // Sign up process
+        // Sign up process with role
         const { data, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            data: { full_name: fullName }
+            emailRedirectTo: `${window.location.origin}/dashboard`,
+            data: { 
+              full_name: fullName,
+              role: selectedRole
+            }
           }
         });
 
@@ -175,22 +179,17 @@ const AuthPage: React.FC = () => {
           return;
         }
 
-        // Immediate login if no confirmation required
-        const { error: signInErr } = await signIn(email, password);
-        if (signInErr) throw signInErr;
-
-        // Create profile
-        const { data: { user }, error: userError } = await supabase.auth.getUser();
-        if (userError) throw userError;
-        
-        if (user) {
+        // For immediate login (when confirmation is disabled)
+        if (data?.user && data.session) {
+          // Create/update profile with selected role
           const { error: profileError } = await supabase
             .from('profiles')
             .upsert([
               {
-                id: user.id,
+                id: data.user.id,
                 full_name: fullName,
                 role: selectedRole,
+                email: email,
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
               }

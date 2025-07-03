@@ -7,7 +7,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, fullName: string, role?: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
 }
@@ -123,8 +123,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
             const currentPath = window.location.pathname;
             if (currentPath === '/auth' || currentPath === '/') {
-              const role = getCachedUserRole();
-              window.location.href = `/dashboard/${role}`;
+              // Always redirect to /dashboard, let RoleRouter handle the role-based routing
+              window.location.href = '/dashboard';
             }
           }, 100);
         }
@@ -159,7 +159,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, [setUserRole, hasRedirected]);
 
-  const signUp = async (email: string, password: string, fullName: string) => {
+  const signUp = async (email: string, password: string, fullName: string, role?: string) => {
     setLoading(true);
     try {
       const { error } = await supabase.auth.signUp({
@@ -167,7 +167,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/dashboard`,
-          data: { full_name: fullName }
+          data: { 
+            full_name: fullName,
+            role: role || 'patient'
+          }
         }
       });
 
