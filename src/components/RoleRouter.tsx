@@ -1,7 +1,7 @@
 // src/components/RoleRouter.tsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../supabaseClient";
+import { supabase } from "@/integrations/supabase/client";
 
 // ✅ استيراد صفحات الواجهات
 import DoctorDashboardPage from "../pages/DoctorDashboardPage";
