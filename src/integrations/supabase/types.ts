@@ -9,6 +9,41 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admin_profiles: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          id: string
+          name: string | null
+          profile_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name?: string | null
+          profile_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name?: string | null
+          profile_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_profiles_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       appointments: {
         Row: {
           appointment_date: string
@@ -214,6 +249,7 @@ export type Database = {
         Row: {
           created_at: string
           date_of_birth: string | null
+          email: string | null
           emergency_contact_name: string | null
           emergency_contact_phone: string | null
           full_name: string | null
@@ -229,6 +265,7 @@ export type Database = {
         Insert: {
           created_at?: string
           date_of_birth?: string | null
+          email?: string | null
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
           full_name?: string | null
@@ -244,6 +281,7 @@ export type Database = {
         Update: {
           created_at?: string
           date_of_birth?: string | null
+          email?: string | null
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
           full_name?: string | null
@@ -300,7 +338,7 @@ export type Database = {
     }
     Functions: {
       generate_otp: {
-        Args: { p_user_id: string } | { user_id: number }
+        Args: { p_user_id: string }
         Returns: undefined
       }
     }

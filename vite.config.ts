@@ -4,6 +4,9 @@ import react from '@vitejs/plugin-react-swc';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
+  server: {
+    port: 8080
+  },
   root: '.', // الجذر هو نفس المجلد الحالي
   publicDir: 'public', // مجلد الملفات الثابتة
   plugins: [
