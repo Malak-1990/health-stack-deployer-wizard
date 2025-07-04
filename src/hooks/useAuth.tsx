@@ -49,7 +49,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return 'patient';
       }
 
-      const role = ['admin', 'doctor', 'family'].includes(profile.role) ? profile.role : 'patient';
+      const role = ['admin', 'doctor', 'family'].includes(profile.role) 
+        ? profile.role as UserRole 
+        : 'patient' as UserRole;
       setUserRole(role);
       persistUserRole(role);
       return role;
