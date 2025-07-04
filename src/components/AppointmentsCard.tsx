@@ -67,9 +67,7 @@ const AppointmentsCard = () => {
       // Type assertion to ensure the status field is properly typed
       const typedAppointments = (data || []).map(appointment => ({
         ...appointment,
-        status: appointment.status as AppointmentStatus,
-        location: appointment.location ?? undefined,
-        notes: appointment.notes ?? undefined
+        status: appointment.status as AppointmentStatus
       }));
       setAppointments(typedAppointments);
     }

@@ -1,13 +1,13 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, UserCheck, AlertTriangle, Heart, Phone, Mail } from 'lucide-react';
-
+import { Search, UserCheck, AlertTriangle, Heart, Phone, Mail, Calendar } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 
 interface Patient {
@@ -26,6 +26,7 @@ interface Patient {
 }
 
 const DoctorPatientList = () => {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);

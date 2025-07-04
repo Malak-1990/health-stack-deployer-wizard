@@ -8,21 +8,24 @@ import {
   CarouselItem,
   CarouselApi,
 } from '@/components/ui/carousel';
-import { Heart, Users, Activity, ArrowRight, Star, CheckCircle } from 'lucide-react';
+import { Heart, Users, Shield, Activity, ArrowRight, Star, CheckCircle, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '@/contexts/LanguageContext';
 import AnimatedFeatureCards from '@/components/AnimatedFeatureCards';
 
 const LandingCarousel = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
     if (!api) {
       return;
     }
 
-    
+    setCount(api.scrollSnapList().length);
     setCurrent(api.selectedScrollSnap() + 1);
 
     api.on("select", () => {

@@ -1,5 +1,5 @@
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 type Language = 'ar' | 'en';
 type Direction = 'rtl' | 'ltr';
@@ -196,7 +196,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const t = (key: string): string => {
-    return (translations[language] as any)[key] || key;
+    return translations[language][key] || key;
   };
 
   return (

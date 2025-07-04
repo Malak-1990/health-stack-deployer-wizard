@@ -24,7 +24,7 @@ interface LogoutButtonProps {
 }
 
 const LogoutButton = ({ variant = 'outline', size = 'default', showText = true }: LogoutButtonProps) => {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 

@@ -53,14 +53,7 @@ const RealtimeHeartMonitor: React.FC = () => {
           .limit(10);
 
         if (readingsError) throw readingsError;
-        const transformedReadings = (initialReadings || []).map(reading => ({
-          ...reading,
-          systolic_bp: reading.systolic_bp ?? undefined,
-          diastolic_bp: reading.diastolic_bp ?? undefined,
-          notes: reading.notes ?? undefined,
-          encrypted_notes: reading.encrypted_notes ?? undefined
-        }));
-        setHeartReadings(transformedReadings);
+        setHeartReadings(initialReadings || []);
 
         // جلب آخر 10 تنبيهات ذكية (غير مقروءة)
         const { data: initialAlerts, error: alertsError } = await supabase
@@ -297,7 +290,7 @@ const RealtimeHeartMonitor: React.FC = () => {
               </div>
             ) : (
               <div className="space-y-4 max-h-96 overflow-y-auto">
-                {smartAlerts.map((alert) => (
+                {smartAlerts.map((alert, index) => (
                   <div
                     key={alert.id}
                     className={`p-4 rounded-lg border-r-4 transition-all duration-300 ${

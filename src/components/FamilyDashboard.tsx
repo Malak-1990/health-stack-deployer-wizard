@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-
+import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -19,6 +19,7 @@ interface PatientData {
 }
 
 const FamilyDashboard = () => {
+  const { user } = useAuth();
   const { t, direction } = useLanguage();
   const { toast } = useToast();
   const [patientData, setPatientData] = useState<PatientData | null>(null);
@@ -66,8 +67,8 @@ const FamilyDashboard = () => {
           latest_heart_rate: heartRate,
           last_reading: latestReading?.recorded_at || null,
           status,
-          emergency_contact_name: profileData.emergency_contact_name ?? undefined,
-          emergency_contact_phone: profileData.emergency_contact_phone ?? undefined
+          emergency_contact_name: profileData.emergency_contact_name,
+          emergency_contact_phone: profileData.emergency_contact_phone
         });
       }
     } catch (error) {

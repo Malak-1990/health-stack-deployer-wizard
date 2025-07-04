@@ -3,8 +3,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
-import { Calendar, TrendingUp, Activity, Heart } from 'lucide-react';
+import { Calendar, TrendingUp, TrendingDown, Activity, Heart } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { heartRateDataService } from '@/services/HeartRateDataService';
 
 interface AnalyticsData {
   daily: any[];

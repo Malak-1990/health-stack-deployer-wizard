@@ -152,7 +152,7 @@ class SmartAlertService {
     return 'تسارع خطير جداً في القلب';
   }
 
-  private getHeartRateRecommendations(_heartRate: number, severity: string): string[] {
+  private getHeartRateRecommendations(heartRate: number, severity: string): string[] {
     const recommendations = [];
     
     if (severity === 'critical') {
@@ -183,7 +183,7 @@ class SmartAlertService {
     return 'ضغط دم طبيعي';
   }
 
-  private getBloodPressureRecommendations(_systolic: number, _diastolic: number, severity: string): string[] {
+  private getBloodPressureRecommendations(systolic: number, diastolic: number, severity: string): string[] {
     const recommendations = [];
     
     if (severity === 'critical') {
@@ -234,8 +234,7 @@ class SmartAlertService {
 
       return (data || []).map(alert => ({
         ...alert,
-        severity: alert.severity as 'low' | 'medium' | 'high' | 'critical',
-        resolved_at: alert.resolved_at || undefined
+        severity: alert.severity as 'low' | 'medium' | 'high' | 'critical'
       }));
     } catch (error) {
       console.error('Error fetching alerts:', error);
@@ -311,8 +310,7 @@ class SmartAlertService {
 
       return (data || []).map(alert => ({
         ...alert,
-        severity: alert.severity as 'low' | 'medium' | 'high' | 'critical',
-        resolved_at: alert.resolved_at || undefined
+        severity: alert.severity as 'low' | 'medium' | 'high' | 'critical'
       }));
     } catch (error) {
       console.error('Error fetching critical alerts:', error);

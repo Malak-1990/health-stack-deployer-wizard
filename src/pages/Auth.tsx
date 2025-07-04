@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
+import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -115,7 +115,7 @@ const AuthPage: React.FC = () => {
   const [message, setMessage] = useState('');
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const navigate = useNavigate();
-  const { signIn, signUp } = useAuth();
+  const { signIn } = useAuth();
 
   // Real-time validation
   useEffect(() => {
@@ -157,9 +157,51 @@ const AuthPage: React.FC = () => {
         setMessage('تم تسجيل الدخول بنجاح. جاري التوجيه...');
         setTimeout(() => navigate('/dashboard'), 1500);
       } else {
-        // Use the signUp function from useAuth hook which handles role properly
-        const { error } = await signUp(email, password, fullName, selectedRole);
-        if (error) throw error;
+        // Sign up process
+        const { data, error: signUpError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: { full_name: fullName }
+          }
+        });
+
+        if (signUpError) throw signUpError;
+
+        // Check if user needs email confirmation
+        if (data?.user && !data.session) {
+          setMessage('تم إرسال رابط التأكيد إلى بريدك الإلكتروني');
+          setLoading(false);
+          return;
+        }
+
+        // Immediate login if no confirmation required
+        const { error: signInErr } = await signIn(email, password);
+        if (signInErr) throw signInErr;
+
+        // Create profile
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (userError) throw userError;
+        
+        if (user) {
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .upsert([
+              {
+                id: user.id,
+                full_name: fullName,
+                role: selectedRole,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+              }
+            ], { onConflict: 'id' });
+
+          if (profileError) {
+            console.error('Profile creation error:', profileError);
+            setMessage('تم إنشاء الحساب ولكن حدث خطأ في إعداد الملف الشخصي');
+            return;
+          }
+        }
         
         setMessage('تم إنشاء الحساب وتسجيل الدخول بنجاح!');
         setTimeout(() => navigate('/dashboard'), 1500);
@@ -221,7 +263,7 @@ const AuthPage: React.FC = () => {
                   fullName && !validation.fullName(fullName) ? 'border-red-300' : 'border-gray-300'
                 }`}
                 required
-                aria-invalid={!!(fullName && !validation.fullName(fullName))}
+                aria-invalid={fullName && !validation.fullName(fullName)}
               />
             </div>
           )}
@@ -237,7 +279,7 @@ const AuthPage: React.FC = () => {
               }`}
               required
               autoComplete="username"
-              aria-invalid={!!(email && !validation.email(email))}
+              aria-invalid={email && !validation.email(email)}
             />
           </div>
 
@@ -252,7 +294,7 @@ const AuthPage: React.FC = () => {
               }`}
               required
               autoComplete={isLogin ? "current-password" : "new-password"}
-              aria-invalid={!!(password && !isLogin && !validation.password(password).isStrong)}
+              aria-invalid={password && !isLogin && !validation.password(password).isStrong}
             />
             {!isLogin && <PasswordStrengthIndicator password={password} />}
           </div>

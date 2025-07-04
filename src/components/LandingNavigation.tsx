@@ -2,11 +2,11 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu, X, Heart, Shield, BarChart3, Users, Smartphone, FileText } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const LandingNavigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
+  const navigate = useNavigate();
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
