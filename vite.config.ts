@@ -1,12 +1,11 @@
-import { defineConfig, type UserConfig } from 'vite';
+import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import { VitePWA } from 'vite-plugin-pwa';
+import path from 'path'; // استيراد مكتبة path لاستخدامها في alias
 
 export default defineConfig({
   plugins: [
-    react({
-      devOptions: { fastRefresh: true }
-    }),
+    react(),
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
@@ -33,22 +32,22 @@ export default defineConfig({
             short_name: "مريض",
             description: "مراقبة معدل ضربات القلب",
             url: "/patient-dashboard",
-            icons: [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
+            icons: [{ src: "/icon-192x192.png", sizes: "192x192" }]
           },
           {
             name: "لوحة تحكم الطبيب",
             short_name: "طبيب",
             description: "متابعة المرضى",
             url: "/doctor-dashboard",
-            icons: [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
+            icons: [{ src: "/icon-192x192.png", sizes: "192x192" }]
           }
         ]
       }
     })
   ],
-  build: {
-    sourcemap: true,
-    target: "esnext"
-  }
-} satisfies UserConfig);
-
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src'), // الربط بين @ ومجلد src
+    },
+  },
+});

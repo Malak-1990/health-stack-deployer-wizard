@@ -1,27 +1,36 @@
-
 import { useState, useEffect } from 'react';
 
+type BeforeInstallPromptEvent = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
+};
+
 export const usePWAInstall = () => {
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showInstallButton, setShowInstallButton] = useState(false);
 
   useEffect(() => {
-    // Register Service Worker for PWA
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js')
+    let registeredSW = false;
+
+    // ✅ 1. Register service worker for PWA support
+    if ('serviceWorker' in navigator && !registeredSW) {
+      navigator.serviceWorker
+        .register('/sw.js')
         .then((registration) => {
-          console.log('SW registered: ', registration);
+          console.log('✅ Service Worker registered:', registration);
+          registeredSW = true;
         })
-        .catch((registrationError) => {
-          console.log('SW registration failed: ', registrationError);
+        .catch((err) => {
+          console.error('❌ Service Worker registration failed:', err);
         });
     }
 
-    // Add beforeinstallprompt event listener
+    // ✅ 2. Listen for install prompt
     const handleBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
+      e.preventDefault(); // Prevent default mini-infobar
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
       setShowInstallButton(true);
+      console.log('👍 beforeinstallprompt event captured');
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -32,13 +41,16 @@ export const usePWAInstall = () => {
   }, []);
 
   const handleInstallClick = async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      console.log(`User response to the install prompt: ${outcome}`);
-      setDeferredPrompt(null);
-      setShowInstallButton(false);
-    }
+    if (!deferredPrompt) return;
+
+    console.log('📦 Showing install prompt');
+    await deferredPrompt.prompt();
+
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`🙋‍♂️ User response: ${outcome}`);
+
+    setDeferredPrompt(null);
+    setShowInstallButton(false);
   };
 
   return { showInstallButton, handleInstallClick };

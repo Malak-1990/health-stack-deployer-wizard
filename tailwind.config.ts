@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 
-export default {
+const config: Config = {
   darkMode: ["class"],
   content: [
     "./pages/**/*.{ts,tsx,js,jsx}",
@@ -12,19 +12,23 @@ export default {
   theme: {
     container: {
       center: true,
-      padding: '2rem',
-      screens: { '2xl': '1400px' }
+      padding: "2rem",
+      screens: {
+        "2xl": "1400px",
+      },
     },
     extend: {
       fontFamily: {
-        cairo: ['Cairo', 'sans-serif'],
+        cairo: ["Cairo", "sans-serif"],
       },
-      // ... باقي التعديلات حسب مشروعك
-    }
+      // Add additional theme extensions here as needed
+    },
   },
   plugins: [
     require("tailwindcss-animate"),
     require("tailwindcss-rtl"),
-    require("@tailwindcss/forms")
-  ]
-} satisfies Config;
+    require("@tailwindcss/forms"),
+  ],
+};
+
+export default config;
