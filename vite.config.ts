@@ -4,9 +4,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
   plugins: [
-    react({
-      devOptions: { fastRefresh: true }
-    }),
+    react(),
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
@@ -46,6 +44,9 @@ export default defineConfig({
       }
     })
   ],
+  server: {
+    port: 8080
+  },
   build: {
     sourcemap: true,
     target: "esnext"

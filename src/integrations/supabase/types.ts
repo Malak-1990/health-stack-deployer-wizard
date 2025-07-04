@@ -9,6 +9,41 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admin_profiles: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          id: string
+          name: string | null
+          profile_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name?: string | null
+          profile_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name?: string | null
+          profile_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_profiles_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       appointments: {
         Row: {
           appointment_date: string
@@ -126,6 +161,36 @@ export type Database = {
         }
         Relationships: []
       }
+      doctor_patient_links: {
+        Row: {
+          doctor_id: string
+          patient_id: string
+        }
+        Insert: {
+          doctor_id: string
+          patient_id: string
+        }
+        Update: {
+          doctor_id?: string
+          patient_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doctor_patient_links_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "doctor_patient_links_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       encrypted_health_data: {
         Row: {
           created_at: string
@@ -152,6 +217,36 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      family_patient_links: {
+        Row: {
+          family_id: string
+          patient_id: string
+        }
+        Insert: {
+          family_id: string
+          patient_id: string
+        }
+        Update: {
+          family_id?: string
+          patient_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_patient_links_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "family_patient_links_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       heart_rate_readings: {
         Row: {
@@ -214,6 +309,7 @@ export type Database = {
         Row: {
           created_at: string
           date_of_birth: string | null
+          email: string | null
           emergency_contact_name: string | null
           emergency_contact_phone: string | null
           full_name: string | null
@@ -229,6 +325,7 @@ export type Database = {
         Insert: {
           created_at?: string
           date_of_birth?: string | null
+          email?: string | null
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
           full_name?: string | null
@@ -244,6 +341,7 @@ export type Database = {
         Update: {
           created_at?: string
           date_of_birth?: string | null
+          email?: string | null
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
           full_name?: string | null
@@ -255,6 +353,36 @@ export type Database = {
           role?: string
           updated_at?: string
           weight_kg?: number | null
+        }
+        Relationships: []
+      }
+      redirection_logs: {
+        Row: {
+          context_data: Json | null
+          created_at: string | null
+          error_message: string | null
+          id: string
+          resolved: boolean | null
+          resolved_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          context_data?: Json | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          resolved?: boolean | null
+          resolved_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          context_data?: Json | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          resolved?: boolean | null
+          resolved_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -300,7 +428,7 @@ export type Database = {
     }
     Functions: {
       generate_otp: {
-        Args: { p_user_id: string } | { user_id: number }
+        Args: { p_user_id: string }
         Returns: undefined
       }
     }

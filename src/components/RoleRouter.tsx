@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../supabaseClient"; // Adjust if path differs
+import { supabase } from "@/integrations/supabase/client";
 
 import DoctorDashboard from "./DoctorDashboard";
 import PatientDashboard from "./PatientDashboard";

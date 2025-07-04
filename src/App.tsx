@@ -25,8 +25,8 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <LanguageProvider>
-          <RoleProvider>
-            <AuthProvider>
+          <AuthProvider>
+            <RoleProvider>
               <Toaster />
               <Sonner />
               <BrowserRouter>
@@ -92,8 +92,8 @@ function App() {
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </BrowserRouter>
-            </AuthProvider>
-          </RoleProvider>
+            </RoleProvider>
+          </AuthProvider>
         </LanguageProvider>
       </TooltipProvider>
     </QueryClientProvider>
