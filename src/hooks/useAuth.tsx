@@ -118,7 +118,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [setUserRole, hasRedirected]);
+  }, [setUserRole]);
 
   const signUp = async (email: string, password: string, fullName: string, role?: string) => {
     setLoading(true);
