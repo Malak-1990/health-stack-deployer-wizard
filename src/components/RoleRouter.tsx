@@ -1,13 +1,10 @@
-// src/components/RoleRouter.tsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../supabaseClient";
-
-// ✅ استيراد صفحات الواجهات
-import DoctorDashboardPage from "../pages/DoctorDashboardPage";
-import PatientDashboardPage from "../pages/PatientDashboardPage";
-import FamilyDashboardPage from "../pages/FamilyDashboardPage";
-import AdminDashboard from "../pages/AdminDashboard";
+import { supabase } from "@/integrations/supabase/client";
+import DoctorDashboard from "@/components/DoctorDashboard";
+import PatientDashboard from "@/components/PatientDashboard";
+import FamilyDashboard from "@/components/FamilyDashboard";
+import AdminUserManager from "@/components/AdminUserManager";
 
 type RoleType = "doctor" | "patient" | "family" | "admin";
 
@@ -31,6 +28,13 @@ const RoleRouter = () => {
         return;
       }
 
+      // Check if user is admin by email
+      if (user.email === 'malaksalama21@gmail.com') {
+        setRole('admin');
+        setLoading(false);
+        return;
+      }
+
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("role")
@@ -40,12 +44,31 @@ const RoleRouter = () => {
       if (!isMounted) return;
 
       if (profileError || !profile?.role) {
-        setError("تعذر جلب بيانات المستخدم. تأكد من إعداد الدور في جدول الحسابات.");
+        // Default to patient role if no profile found
+        setRole('patient');
         setLoading(false);
         return;
       }
 
-      setRole(profile.role as RoleType);
+      // Map database roles to component roles
+      let userRole: RoleType = 'patient';
+      switch (profile.role) {
+        case 'admin':
+          userRole = 'admin';
+          break;
+        case 'doctor':
+          userRole = 'doctor';
+          break;
+        case 'family':
+          userRole = 'family';
+          break;
+        case 'user':
+        default:
+          userRole = 'patient';
+          break;
+      }
+
+      setRole(userRole);
       setLoading(false);
     };
 
@@ -55,15 +78,18 @@ const RoleRouter = () => {
 
   if (loading) {
     return (
-      <main dir="rtl" lang="ar" className="flex items-center justify-center min-h-screen">
-        <span className="text-gray-700 text-lg font-semibold" aria-busy="true">جاري تحميل الواجهة...</span>
+      <main dir="rtl" lang="ar" className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <span className="text-gray-700 text-lg font-semibold">جاري تحميل الواجهة...</span>
+        </div>
       </main>
     );
   }
 
   if (error) {
     return (
-      <main dir="rtl" lang="ar" className="flex flex-col items-center justify-center min-h-screen text-red-700">
+      <main dir="rtl" lang="ar" className="flex flex-col items-center justify-center min-h-screen text-red-700 bg-gray-50">
         <p className="text-lg font-medium">{error}</p>
         <button
           onClick={() => navigate("/auth", { replace: true })}
@@ -77,13 +103,13 @@ const RoleRouter = () => {
 
   switch (role) {
     case "doctor":
-      return <DoctorDashboardPage />;
+      return <DoctorDashboard />;
     case "patient":
-      return <PatientDashboardPage />;
+      return <PatientDashboard />;
     case "family":
-      return <FamilyDashboardPage />;
+      return <FamilyDashboard />;
     case "admin":
-      return <AdminDashboard />;
+      return <AdminUserManager />;
     default:
       navigate("/auth", { replace: true });
       return null;
