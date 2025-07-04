@@ -3,13 +3,10 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Badge } from '@/components/ui/badge';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, BarChart, Bar } from 'recharts';
-import { Calendar as CalendarIcon, Download, Filter, TrendingUp, TrendingDown, Heart, Activity } from 'lucide-react';
+import { Download, Filter, TrendingUp, TrendingDown, Heart, Activity } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { heartRateDataService } from '@/services/HeartRateDataService';
 import { useToast } from '@/hooks/use-toast';
@@ -23,16 +20,10 @@ interface HistoricalData {
   status: 'normal' | 'warning' | 'critical';
 }
 
-interface DataPoint {
-  date: string;
-  value: number;
-  type: 'heart_rate' | 'systolic' | 'diastolic';
-}
-
 const LongTermDataHistory = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
+  const [dateRange] = useState<{ from: Date; to: Date }>({
     from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
     to: new Date()
   });

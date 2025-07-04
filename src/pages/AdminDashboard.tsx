@@ -19,14 +19,6 @@ interface AdminStats {
   totalReadings: number;
 }
 
-interface User {
-  id: string;
-  full_name: string | null;
-  role: string;
-  created_at: string;
-  emergency_contact_name: string | null;
-  emergency_contact_phone: string | null;
-}
 
 interface Alert {
   id: string;
@@ -45,7 +37,6 @@ const AdminDashboard = () => {
   const { userRole } = useRole();
   const { toast } = useToast();
   const [stats, setStats] = useState<AdminStats | null>(null);
-  const [users, setUsers] = useState<User[]>([]);
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -61,14 +52,12 @@ const AdminDashboard = () => {
   const loadAdminData = async () => {
     try {
       setLoading(true);
-      const [statsData, usersData, alertsData] = await Promise.all([
+      const [statsData, alertsData] = await Promise.all([
         adminService.getStats(),
-        adminService.getAllUsers(),
         adminService.getAllAlerts()
       ]);
 
       setStats(statsData);
-      setUsers(usersData);
       setAlerts(alertsData);
     } catch (error) {
       console.error('Error loading admin data:', error);

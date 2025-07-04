@@ -1,5 +1,5 @@
 import path from 'path';
-import { defineConfig, type UserConfig } from 'vite';
+import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import { VitePWA } from 'vite-plugin-pwa';
 import { componentTagger } from "lovable-tagger";
@@ -10,9 +10,7 @@ export default defineConfig(({ mode }) => ({
     port: 8080
   },
   plugins: [
-    react({
-      devOptions: { fastRefresh: true }
-    }),
+    react(),
     mode === 'development' && componentTagger(),
     VitePWA({
       registerType: 'autoUpdate',
