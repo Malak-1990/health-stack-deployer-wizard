@@ -115,7 +115,7 @@ const AuthPage: React.FC = () => {
   const [message, setMessage] = useState('');
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const navigate = useNavigate();
-  const { signIn } = useAuth();
+  const { signIn, signUp } = useAuth();
 
   // Real-time validation
   useEffect(() => {
@@ -157,50 +157,9 @@ const AuthPage: React.FC = () => {
         setMessage('تم تسجيل الدخول بنجاح. جاري التوجيه...');
         setTimeout(() => navigate('/dashboard'), 1500);
       } else {
-        // Sign up process with role
-        const { data, error: signUpError } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/dashboard`,
-            data: { 
-              full_name: fullName,
-              role: selectedRole
-            }
-          }
-        });
-
-        if (signUpError) throw signUpError;
-
-        // Check if user needs email confirmation
-        if (data?.user && !data.session) {
-          setMessage('تم إرسال رابط التأكيد إلى بريدك الإلكتروني');
-          setLoading(false);
-          return;
-        }
-
-        // For immediate login (when confirmation is disabled)
-        if (data?.user && data.session) {
-          // Create/update profile with selected role
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .upsert([
-              {
-                id: data.user.id,
-                full_name: fullName,
-                role: selectedRole,
-                email: email,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
-              }
-            ], { onConflict: 'id' });
-
-          if (profileError) {
-            console.error('Profile creation error:', profileError);
-            setMessage('تم إنشاء الحساب ولكن حدث خطأ في إعداد الملف الشخصي');
-            return;
-          }
-        }
+        // Use the signUp function from useAuth hook which handles role properly
+        const { error } = await signUp(email, password, fullName, selectedRole);
+        if (error) throw error;
         
         setMessage('تم إنشاء الحساب وتسجيل الدخول بنجاح!');
         setTimeout(() => navigate('/dashboard'), 1500);

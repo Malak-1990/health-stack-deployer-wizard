@@ -161,6 +161,36 @@ export type Database = {
         }
         Relationships: []
       }
+      doctor_patient_links: {
+        Row: {
+          doctor_id: string
+          patient_id: string
+        }
+        Insert: {
+          doctor_id: string
+          patient_id: string
+        }
+        Update: {
+          doctor_id?: string
+          patient_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doctor_patient_links_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "doctor_patient_links_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       encrypted_health_data: {
         Row: {
           created_at: string
@@ -187,6 +217,36 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      family_patient_links: {
+        Row: {
+          family_id: string
+          patient_id: string
+        }
+        Insert: {
+          family_id: string
+          patient_id: string
+        }
+        Update: {
+          family_id?: string
+          patient_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_patient_links_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "family_patient_links_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       heart_rate_readings: {
         Row: {
@@ -293,6 +353,36 @@ export type Database = {
           role?: string
           updated_at?: string
           weight_kg?: number | null
+        }
+        Relationships: []
+      }
+      redirection_logs: {
+        Row: {
+          context_data: Json | null
+          created_at: string | null
+          error_message: string | null
+          id: string
+          resolved: boolean | null
+          resolved_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          context_data?: Json | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          resolved?: boolean | null
+          resolved_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          context_data?: Json | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          resolved?: boolean | null
+          resolved_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
