@@ -67,8 +67,8 @@ const FamilyDashboard = () => {
           latest_heart_rate: heartRate,
           last_reading: latestReading?.recorded_at || null,
           status,
-          emergency_contact_name: profileData.emergency_contact_name,
-          emergency_contact_phone: profileData.emergency_contact_phone
+          emergency_contact_name: profileData.emergency_contact_name ?? undefined,
+          emergency_contact_phone: profileData.emergency_contact_phone ?? undefined
         });
       }
     } catch (error) {

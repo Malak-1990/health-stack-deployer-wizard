@@ -65,7 +65,17 @@ const DailyLogCard = () => {
         variant: "destructive",
       });
     } else if (data) {
-      setTodayLog(data);
+      const transformedData = {
+        ...data,
+        sleep_hours: data.sleep_hours ?? undefined,
+        water_intake_ml: data.water_intake_ml ?? undefined,
+        exercise_minutes: data.exercise_minutes ?? undefined,
+        stress_level: data.stress_level ?? undefined,
+        mood: data.mood ?? undefined,
+        weight_kg: data.weight_kg ?? undefined,
+        notes: data.notes ?? undefined
+      };
+      setTodayLog(transformedData);
       setFormData({
         sleep_hours: data.sleep_hours?.toString() || '',
         water_intake_ml: data.water_intake_ml?.toString() || '',

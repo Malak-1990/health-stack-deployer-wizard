@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -73,7 +73,20 @@ const PatientProfileModal = ({ patientId, patientName, children }: PatientProfil
 
       if (heartError) throw heartError;
 
-      setProfile(profileData);
+      const transformedProfile = {
+        ...profileData,
+        full_name: profileData.full_name || 'غير محدد',
+        date_of_birth: profileData.date_of_birth ?? undefined,
+        email: profileData.email ?? undefined,
+        emergency_contact_name: profileData.emergency_contact_name ?? undefined,
+        emergency_contact_phone: profileData.emergency_contact_phone ?? undefined,
+        gender: profileData.gender ?? undefined,
+        height_cm: profileData.height_cm ?? undefined,
+        weight_kg: profileData.weight_kg ?? undefined,
+        medical_conditions: profileData.medical_conditions ?? undefined,
+        medications: profileData.medications ?? undefined
+      };
+      setProfile(transformedProfile);
       setHeartRateData(heartData || []);
 
     } catch (error) {

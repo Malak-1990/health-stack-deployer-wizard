@@ -53,7 +53,14 @@ const RealtimeHeartMonitor: React.FC = () => {
           .limit(10);
 
         if (readingsError) throw readingsError;
-        setHeartReadings(initialReadings || []);
+        const transformedReadings = (initialReadings || []).map(reading => ({
+          ...reading,
+          systolic_bp: reading.systolic_bp ?? undefined,
+          diastolic_bp: reading.diastolic_bp ?? undefined,
+          notes: reading.notes ?? undefined,
+          encrypted_notes: reading.encrypted_notes ?? undefined
+        }));
+        setHeartReadings(transformedReadings);
 
         // جلب آخر 10 تنبيهات ذكية (غير مقروءة)
         const { data: initialAlerts, error: alertsError } = await supabase

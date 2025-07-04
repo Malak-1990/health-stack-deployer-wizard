@@ -62,7 +62,14 @@ const HeartRateCard = ({ onUpdate }: HeartRateCardProps) => {
         variant: "destructive",
       });
     } else {
-      setReadings(data || []);
+      const transformedReadings = (data || []).map(reading => ({
+        ...reading,
+        systolic_bp: reading.systolic_bp ?? undefined,
+        diastolic_bp: reading.diastolic_bp ?? undefined,
+        notes: reading.notes ?? undefined,
+        encrypted_notes: reading.encrypted_notes ?? undefined
+      }));
+      setReadings(transformedReadings);
     }
   };
 

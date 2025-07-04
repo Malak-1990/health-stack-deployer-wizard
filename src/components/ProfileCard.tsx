@@ -66,7 +66,20 @@ const ProfileCard = () => {
         variant: "destructive",
       });
     } else if (data) {
-      setProfile(data);
+      const transformedProfile = {
+        ...data,
+        full_name: data.full_name ?? undefined,
+        date_of_birth: data.date_of_birth ?? undefined,
+        email: data.email ?? undefined,
+        emergency_contact_name: data.emergency_contact_name ?? undefined,
+        emergency_contact_phone: data.emergency_contact_phone ?? undefined,
+        gender: data.gender ?? undefined,
+        height_cm: data.height_cm ?? undefined,
+        weight_kg: data.weight_kg ?? undefined,
+        medical_conditions: data.medical_conditions ?? undefined,
+        medications: data.medications ?? undefined
+      };
+      setProfile(transformedProfile);
       setFormData({
         full_name: data.full_name || '',
         date_of_birth: data.date_of_birth || '',
