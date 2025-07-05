@@ -184,17 +184,21 @@ const AuthPage: React.FC = () => {
         if (userError) throw userError;
         
         if (user) {
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .upsert([
-              {
-                id: user.id,
-                full_name: fullName,
-                role: selectedRole,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
-              }
-            ], { onConflict: 'id' });
+              const { error: profileError } = await supabase
+                .from('profiles')
+                .upsert([
+                  {
+                    id: user.id,
+                    full_name: fullName,
+                    role: selectedRole,
+                    email: user.email,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                  }
+                ], { 
+                  onConflict: 'id',
+                  ignoreDuplicates: false 
+                });
 
           if (profileError) {
             console.error('Profile creation error:', profileError);
@@ -204,7 +208,23 @@ const AuthPage: React.FC = () => {
         }
         
         setMessage('تم إنشاء الحساب وتسجيل الدخول بنجاح!');
-        setTimeout(() => navigate('/dashboard'), 1500);
+        
+        // Redirect based on selected role
+        let redirectPath = '/patient-dashboard';
+        switch (selectedRole) {
+          case 'doctor':
+            redirectPath = '/doctor-dashboard';
+            break;
+          case 'family':
+            redirectPath = '/family-dashboard';
+            break;
+          case 'patient':
+          default:
+            redirectPath = '/patient-dashboard';
+            break;
+        }
+        
+        setTimeout(() => navigate(redirectPath), 1500);
       }
     } catch (error: any) {
       console.error('Auth error:', error);
