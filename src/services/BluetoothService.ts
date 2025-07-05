@@ -61,7 +61,7 @@ class BluetoothService {
     }
   }
 
-  async connectToDevice(deviceId: string): Promise<boolean> {
+  async connectToDevice(): Promise<boolean> {
     try {
       if (this.isConnecting) {
         throw new Error('جاري الاتصال بالفعل...');

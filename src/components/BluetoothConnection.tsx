@@ -60,7 +60,7 @@ const BluetoothConnection = ({ onHeartRateUpdate }: BluetoothConnectionProps) =>
     try {
       const devices = await bluetoothService.scanForDevices();
       if (devices.length > 0) {
-        const connected = await bluetoothService.connectToDevice(devices[0].id);
+        const connected = await bluetoothService.connectToDevice();
         if (connected) {
           setIsConnected(true);
           toast({
