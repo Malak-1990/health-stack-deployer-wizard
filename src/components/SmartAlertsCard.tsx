@@ -217,8 +217,6 @@ const SmartAlertsCard = () => {
     );
   }
 
-  const unreadAlerts = alerts.filter(alert => !alert.is_read && !alert.resolved_at);
-  const criticalAlerts = alerts.filter(alert => alert.severity === 'critical' && !alert.resolved_at);
 
   return (
     <Card>

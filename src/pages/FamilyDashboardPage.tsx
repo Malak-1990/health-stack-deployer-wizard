@@ -4,7 +4,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/hooks/useAuth';
 import { useRole } from '@/contexts/RoleContext';
 import { Navigate } from 'react-router-dom';
-import { Heart, Settings, LogOut, Users } from 'lucide-react';
+import { Settings, LogOut, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import FamilyDashboard from '@/components/FamilyDashboard';
 

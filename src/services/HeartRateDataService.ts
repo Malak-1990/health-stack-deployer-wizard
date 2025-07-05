@@ -2,7 +2,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { EncryptionService } from './EncryptionService';
 import { smartAlertService } from './SmartAlertService';
-import { useAuth } from '@/hooks/useAuth';
 
 interface HeartRateReading {
   heartRate: number;

@@ -4,13 +4,13 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/hooks/useAuth';
 import { useRole } from '@/contexts/RoleContext';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
-import { Heart, Settings, Menu, LogOut, User, Download } from 'lucide-react';
+import { Settings, User, Download } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import PatientDashboard from '@/components/PatientDashboard';
 import LogoutButton from '@/components/LogoutButton';
 
 const PatientDashboardPage = () => {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const { userRole } = useRole();
   const { direction } = useLanguage();
   const { showInstallButton, handleInstallClick } = usePWAInstall();

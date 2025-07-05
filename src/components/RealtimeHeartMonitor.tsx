@@ -290,7 +290,7 @@ const RealtimeHeartMonitor: React.FC = () => {
               </div>
             ) : (
               <div className="space-y-4 max-h-96 overflow-y-auto">
-                {smartAlerts.map((alert, index) => (
+                {smartAlerts.map((alert) => (
                   <div
                     key={alert.id}
                     className={`p-4 rounded-lg border-r-4 transition-all duration-300 ${

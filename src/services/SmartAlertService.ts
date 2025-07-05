@@ -12,7 +12,7 @@ export interface SmartAlert {
   data?: any;
   is_read: boolean;
   created_at: string;
-  resolved_at?: string;
+  resolved_at?: string | null;
 }
 
 class SmartAlertService {
@@ -152,7 +152,7 @@ class SmartAlertService {
     return 'تسارع خطير جداً في القلب';
   }
 
-  private getHeartRateRecommendations(heartRate: number, severity: string): string[] {
+  private getHeartRateRecommendations(_heartRate: number, severity: string): string[] {
     const recommendations = [];
     
     if (severity === 'critical') {
@@ -183,7 +183,7 @@ class SmartAlertService {
     return 'ضغط دم طبيعي';
   }
 
-  private getBloodPressureRecommendations(systolic: number, diastolic: number, severity: string): string[] {
+  private getBloodPressureRecommendations(_systolic: number, _diastolic: number, severity: string): string[] {
     const recommendations = [];
     
     if (severity === 'critical') {

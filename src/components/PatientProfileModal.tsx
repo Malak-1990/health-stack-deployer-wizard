@@ -1,7 +1,6 @@
 
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -23,26 +22,9 @@ interface HeartRateReading {
   device_id?: string;
 }
 
-interface PatientProfile {
-  id: string;
-  full_name: string | null;
-  email: string | null;
-  phone: string | null;
-  age: number | null;
-  date_of_birth: string | null;
-  gender: string | null;
-  height_cm: number | null;
-  weight_kg: number | null;
-  medical_conditions: string[] | null;
-  medications: string[] | null;
-  emergency_contact_name: string | null;
-  emergency_contact_phone: string | null;
-}
-
 const PatientProfileModal = ({ patientId, patientName, children }: PatientProfileModalProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [profile, setProfile] = useState<PatientProfile | null>(null);
   const [heartRateData, setHeartRateData] = useState<HeartRateReading[]>([]);
   const { toast } = useToast();
 
@@ -52,7 +34,7 @@ const PatientProfileModal = ({ patientId, patientName, children }: PatientProfil
     setLoading(true);
     try {
       // تحميل ملف المريض
-      const { data: profileData, error: profileError } = await supabase
+      const { error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', patientId)
@@ -269,67 +251,51 @@ const PatientProfileModal = ({ patientId, patientName, children }: PatientProfil
                     <div className="flex items-center gap-2">
                       <User className="h-4 w-4 text-gray-500" />
                       <span className="font-medium">الاسم:</span>
-                      <span>{profile?.full_name || 'غير محدد'}</span>
+                      <span>غير محدد</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Mail className="h-4 w-4 text-gray-500" />
                       <span className="font-medium">البريد الإلكتروني:</span>
-                      <span>{profile?.email || 'غير محدد'}</span>
+                      <span>غير محدد</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Phone className="h-4 w-4 text-gray-500" />
                       <span className="font-medium">الهاتف:</span>
-                      <span>{profile?.phone || 'غير محدد'}</span>
+                      <span>غير محدد</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4 text-gray-500" />
                       <span className="font-medium">العمر:</span>
-                      <span>{profile?.age || 'غير محدد'}</span>
+                      <span>غير محدد</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4 text-gray-500" />
                       <span className="font-medium">تاريخ الميلاد:</span>
-                      <span>{profile?.date_of_birth || 'غير محدد'}</span>
+                      <span>غير محدد</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <User className="h-4 w-4 text-gray-500" />
                       <span className="font-medium">الجنس:</span>
-                      <span>{profile?.gender || 'غير محدد'}</span>
+                      <span>غير محدد</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Scale className="h-4 w-4 text-gray-500" />
                       <span className="font-medium">الطول:</span>
-                      <span>{profile?.height_cm || 'غير محدد'}</span>
+                      <span>غير محدد</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Scale className="h-4 w-4 text-gray-500" />
                       <span className="font-medium">الوزن:</span>
-                      <span>{profile?.weight_kg || 'غير محدد'}</span>
+                      <span>غير محدد</span>
                     </div>
                   </div>
 
-                  {profile?.medical_conditions && (
-                    <div>
-                      <h4 className="font-medium mb-2">الأمراض المرضية:</h4>
-                      <p className="text-gray-600 p-3 bg-gray-50 rounded-lg">{profile.medical_conditions?.join(', ')}</p>
-                    </div>
-                  )}
-
-                  {profile?.medications && (
-                    <div>
-                      <h4 className="font-medium mb-2">الأدوية الحالية:</h4>
-                      <p className="text-gray-600 p-3 bg-gray-50 rounded-lg">{profile.medications}</p>
-                    </div>
-                  )}
-
-                  {profile?.emergency_contact_name && profile?.emergency_contact_phone && (
-                    <div>
-                      <h4 className="font-medium mb-2">جهة الاتصال في الطوارئ:</h4>
-                      <p className="text-gray-600 p-3 bg-gray-50 rounded-lg">
-                        {profile.emergency_contact_name} - {profile.emergency_contact_phone}
-                      </p>
-                    </div>
-                  )}
+                  <div>
+                    <h4 className="font-medium mb-2">معلومات إضافية:</h4>
+                    <p className="text-gray-600 p-3 bg-gray-50 rounded-lg">
+                      يمكن عرض معلومات إضافية عن المريض هنا
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
