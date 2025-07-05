@@ -1,22 +1,27 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/hooks/useAuth";
-import { LanguageProvider } from "@/contexts/LanguageContext";
+
 import { RoleProvider } from "@/contexts/RoleContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
+import { AuthProvider } from "@/hooks/useAuth";
+
+import ProtectedRoute from "@/components/ProtectedRoute";
+import RoleRouter from "@/components/RoleRouter";
+
 import Landing from "@/pages/Landing";
 import Auth from "@/pages/Auth";
-import RoleRouter from "@/components/RoleRouter";
+import ContactPage from "@/pages/Contact";
+import NotFound from "@/pages/NotFound";
+
 import DoctorDashboard from "@/components/DoctorDashboard";
 import PatientDashboard from "@/components/PatientDashboard";
 import FamilyDashboard from "@/components/FamilyDashboard";
 import AdminUserManager from "@/components/AdminUserManager";
 import Settings from "@/pages/Settings";
-import NotFound from "@/pages/NotFound";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import ContactPage from "@/pages/Contact";
 
 const queryClient = new QueryClient();
 
@@ -25,18 +30,22 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <LanguageProvider>
-          <AuthProvider>
-            <RoleProvider>
+          {/* ✅ التأكد من ترتيب الـ Providers الصحيح */}
+          <RoleProvider>
+            <AuthProvider>
+              {/* التنبيهات والتوستر */}
               <Toaster />
               <Sonner />
+
+              {/* نظام التوجيه */}
               <BrowserRouter>
                 <Routes>
-                  {/* Public Routes */}
+                  {/* صفحات عامة */}
                   <Route path="/" element={<Landing />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/contact" element={<ContactPage />} />
 
-                  {/* Role-based dashboard routing */}
+                  {/* لوحة التحكم الديناميكية حسب الدور */}
                   <Route
                     path="/dashboard"
                     element={
@@ -46,7 +55,7 @@ function App() {
                     }
                   />
 
-                  {/* Direct dashboard access for deep links/bookmarks */}
+                  {/* روابط مباشرة لكل لوحة تحكم حسب الدور */}
                   <Route
                     path="/doctor-dashboard"
                     element={
@@ -88,12 +97,12 @@ function App() {
                     }
                   />
 
-                  {/* Fallback */}
+                  {/* صفحة الخطأ عند عدم تطابق أي مسار */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </BrowserRouter>
-            </RoleProvider>
-          </AuthProvider>
+            </AuthProvider>
+          </RoleProvider>
         </LanguageProvider>
       </TooltipProvider>
     </QueryClientProvider>
