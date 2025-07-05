@@ -263,7 +263,7 @@ const AuthPage: React.FC = () => {
                   fullName && !validation.fullName(fullName) ? 'border-red-300' : 'border-gray-300'
                 }`}
                 required
-                aria-invalid={fullName && !validation.fullName(fullName)}
+                aria-invalid={fullName && !validation.fullName(fullName) ? "true" : "false"}
               />
             </div>
           )}
@@ -279,7 +279,7 @@ const AuthPage: React.FC = () => {
               }`}
               required
               autoComplete="username"
-              aria-invalid={email && !validation.email(email)}
+              aria-invalid={email && !validation.email(email) ? "true" : "false"}
             />
           </div>
 
@@ -294,7 +294,7 @@ const AuthPage: React.FC = () => {
               }`}
               required
               autoComplete={isLogin ? "current-password" : "new-password"}
-              aria-invalid={password && !isLogin && !validation.password(password).isStrong}
+              aria-invalid={password && !isLogin && !validation.password(password).isStrong ? "true" : "false"}
             />
             {!isLogin && <PasswordStrengthIndicator password={password} />}
           </div>

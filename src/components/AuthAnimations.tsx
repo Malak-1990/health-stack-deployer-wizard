@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Heart, Users, Stethoscope, Activity, Shield, Bell } from 'lucide-react';
+import { Heart, Users, Stethoscope, Activity } from 'lucide-react';
 
 const AuthAnimations = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
