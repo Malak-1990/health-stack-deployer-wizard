@@ -7,10 +7,10 @@ interface HeartRateReading {
   id: string;
   user_id: string;
   heart_rate: number;
-  systolic_bp?: number;
-  diastolic_bp?: number;
+  systolic_bp: number | null;
+  diastolic_bp: number | null;
   recorded_at: string;
-  notes?: string;
+  notes: string | null;
 }
 
 interface SmartAlert {

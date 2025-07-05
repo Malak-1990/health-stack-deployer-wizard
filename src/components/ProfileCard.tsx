@@ -14,15 +14,15 @@ import { useToast } from '@/hooks/use-toast';
 
 interface Profile {
   id: string;
-  full_name?: string;
-  date_of_birth?: string;
-  gender?: string;
-  height_cm?: number;
-  weight_kg?: number;
-  emergency_contact_name?: string;
-  emergency_contact_phone?: string;
-  medical_conditions?: string[];
-  medications?: string[];
+  full_name: string | null;
+  date_of_birth: string | null;
+  gender: string | null;
+  height_cm: number | null;
+  weight_kg: number | null;
+  emergency_contact_name: string | null;
+  emergency_contact_phone: string | null;
+  medical_conditions: string[] | null;
+  medications: string[] | null;
 }
 
 const ProfileCard = () => {

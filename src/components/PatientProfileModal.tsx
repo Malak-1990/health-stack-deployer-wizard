@@ -25,18 +25,18 @@ interface HeartRateReading {
 
 interface PatientProfile {
   id: string;
-  full_name: string;
-  email?: string;
-  phone?: string;
-  age?: number;
-  date_of_birth?: string;
-  gender?: string;
-  height_cm?: number;
-  weight_kg?: number;
-  medical_conditions?: string[];
-  medications?: string[];
-  emergency_contact_name?: string;
-  emergency_contact_phone?: string;
+  full_name: string | null;
+  email: string | null;
+  phone: string | null;
+  age: number | null;
+  date_of_birth: string | null;
+  gender: string | null;
+  height_cm: number | null;
+  weight_kg: number | null;
+  medical_conditions: string[] | null;
+  medications: string[] | null;
+  emergency_contact_name: string | null;
+  emergency_contact_phone: string | null;
 }
 
 const PatientProfileModal = ({ patientId, patientName, children }: PatientProfileModalProps) => {
@@ -73,7 +73,7 @@ const PatientProfileModal = ({ patientId, patientName, children }: PatientProfil
 
       if (heartError) throw heartError;
 
-      setProfile(profileData);
+      // Fix the patient profile to match database fields
       setHeartRateData(heartData || []);
 
     } catch (error) {

@@ -248,6 +248,36 @@ export type Database = {
           },
         ]
       }
+      frontend_diagnostics: {
+        Row: {
+          browser_info: Json | null
+          created_at: string | null
+          error_message: string | null
+          id: string
+          page_url: string | null
+          stack_trace: string | null
+          user_id: string | null
+        }
+        Insert: {
+          browser_info?: Json | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          page_url?: string | null
+          stack_trace?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          browser_info?: Json | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          page_url?: string | null
+          stack_trace?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       heart_rate_readings: {
         Row: {
           created_at: string
@@ -422,14 +452,74 @@ export type Database = {
         }
         Relationships: []
       }
+      users: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          email_confirmed_at: string | null
+          id: string
+          last_sign_in_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          email_confirmed_at?: string | null
+          id?: string
+          last_sign_in_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          email_confirmed_at?: string | null
+          id?: string
+          last_sign_in_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      ensure_user_has_profile: {
+        Args: { user_email: string }
+        Returns: string
+      }
       generate_otp: {
         Args: { p_user_id: string }
         Returns: undefined
+      }
+      get_current_user_role: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      get_current_user_with_auth: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          email: string
+          full_name: string
+          role: string
+          created_at: string
+          updated_at: string
+          email_confirmed_at: string
+          last_sign_in_at: string
+        }[]
+      }
+      get_user_role: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      grant_admin_privileges: {
+        Args: { user_email: string }
+        Returns: boolean
+      }
+      is_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
       }
     }
     Enums: {

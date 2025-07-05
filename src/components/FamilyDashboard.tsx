@@ -14,12 +14,11 @@ interface PatientData {
   latest_heart_rate: number | null;
   last_reading: string | null;
   status: 'normal' | 'warning' | 'critical';
-  emergency_contact_name?: string;
-  emergency_contact_phone?: string;
+  emergency_contact_name: string | null;
+  emergency_contact_phone: string | null;
 }
 
 const FamilyDashboard = () => {
-  const { user } = useAuth();
   const { t, direction } = useLanguage();
   const { toast } = useToast();
   const [patientData, setPatientData] = useState<PatientData | null>(null);

@@ -16,13 +16,13 @@ import { format } from 'date-fns';
 interface DailyLog {
   id: string;
   date: string;
-  sleep_hours?: number;
-  water_intake_ml?: number;
-  exercise_minutes?: number;
-  stress_level?: number;
-  mood?: number;
-  weight_kg?: number;
-  notes?: string;
+  sleep_hours: number | null;
+  water_intake_ml: number | null;
+  exercise_minutes: number | null;
+  stress_level: number | null;
+  mood: number | null;
+  weight_kg: number | null;
+  notes: string | null;
 }
 
 const DailyLogCard = () => {

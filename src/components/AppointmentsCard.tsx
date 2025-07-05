@@ -21,8 +21,8 @@ interface Appointment {
   doctor_name: string;
   appointment_type: string;
   appointment_date: string;
-  location?: string;
-  notes?: string;
+  location: string | null;
+  notes: string | null;
   status: AppointmentStatus;
 }
 

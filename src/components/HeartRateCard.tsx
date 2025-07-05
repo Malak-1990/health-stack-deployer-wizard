@@ -16,9 +16,9 @@ import { format } from 'date-fns';
 interface HeartRateReading {
   id: string;
   heart_rate: number;
-  systolic_bp?: number;
-  diastolic_bp?: number;
-  notes?: string;
+  systolic_bp: number | null;
+  diastolic_bp: number | null;
+  notes: string | null;
   recorded_at: string;
 }
 
