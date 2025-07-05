@@ -45,7 +45,6 @@ const AdminDashboard = () => {
   const { userRole } = useRole();
   const { toast } = useToast();
   const [stats, setStats] = useState<AdminStats | null>(null);
-  const [users, setUsers] = useState<User[]>([]);
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [loading, setLoading] = useState(true);
 

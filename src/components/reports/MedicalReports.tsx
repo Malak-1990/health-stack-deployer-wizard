@@ -9,7 +9,6 @@ import { Badge } from '@/components/ui/badge';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { Calendar as CalendarIcon, Download, FileText, Printer, Share, TrendingUp, Heart, Activity } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 
 interface MedicalReport {
